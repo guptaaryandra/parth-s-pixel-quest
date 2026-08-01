@@ -12,7 +12,8 @@ const panel =
   "absolute inset-0 z-30 flex flex-col items-center justify-center gap-5 bg-overlay/85 px-6 text-center backdrop-blur-sm animate-fade-in";
 
 const cta =
-  "inline-flex items-center gap-2 rounded-2xl bg-gradient-hero px-7 py-3 font-pixel text-xs text-primary-foreground shadow-glow transition hover:brightness-110 active:scale-95";
+  "inline-flex touch-manipulation select-none items-center gap-2 rounded-2xl bg-gradient-hero px-7 py-3 font-pixel text-xs text-primary-foreground shadow-glow transition hover:brightness-110 active:scale-95";
+
 
 export function Overlay({ status, score, onPlay, onResume }: Props) {
   if (status === "playing") return null;
@@ -32,7 +33,7 @@ export function Overlay({ status, score, onPlay, onResume }: Props) {
           Gather every glowing crystal, scoop up the coins, and slip past the cute shadow monsters
           of the twilight valley.
         </p>
-        <button onClick={onPlay} className={cta}>
+        <button type="button" onPointerUp={onPlay} className={cta}>
           <Play size={16} /> Play
         </button>
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
@@ -52,12 +53,13 @@ export function Overlay({ status, score, onPlay, onResume }: Props) {
       <div className={panel}>
         <h2 className="font-pixel text-xl text-foreground">Paused</h2>
         <div className="flex flex-wrap justify-center gap-3">
-          <button onClick={onResume} className={cta}>
+          <button type="button" onPointerUp={onResume} className={cta}>
             <Play size={16} /> Resume
           </button>
           <button
-            onClick={onPlay}
-            className="inline-flex items-center gap-2 rounded-2xl border border-border bg-panel px-6 py-3 font-pixel text-xs text-foreground transition hover:bg-accent active:scale-95"
+            type="button"
+            onPointerUp={onPlay}
+            className="inline-flex touch-manipulation select-none items-center gap-2 rounded-2xl border border-border bg-panel px-6 py-3 font-pixel text-xs text-foreground transition hover:bg-accent active:scale-95"
           >
             <RotateCcw size={16} /> Restart
           </button>
@@ -83,7 +85,7 @@ export function Overlay({ status, score, onPlay, onResume }: Props) {
         <span className="text-xs uppercase tracking-widest text-muted-foreground">Score</span>
         <div className="font-pixel text-xl text-gold tabular-nums">{score}</div>
       </div>
-      <button onClick={onPlay} className={cta}>
+      <button type="button" onPointerUp={onPlay} className={cta}>
         <RotateCcw size={16} /> Play again
       </button>
     </div>
