@@ -8,6 +8,7 @@ import {
   Pause,
   Play,
   RotateCcw,
+  RotateCw,
   Volume2,
   VolumeX,
 } from "lucide-react";
@@ -18,6 +19,18 @@ import { sfx } from "@/game/audio";
 import { Hud } from "./Hud";
 import { Overlay } from "./Overlay";
 import { TouchPad } from "./TouchPad";
+
+function useIsPortrait() {
+  const [portrait, setPortrait] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(orientation: portrait)");
+    const update = () => setPortrait(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return portrait;
+}
 
 export function GameShell() {
   const [status, setStatus] = useState<GameStatus>("start");
@@ -116,6 +129,7 @@ export function GameShell() {
     return () => window.removeEventListener("keydown", onKey);
   });
 
+  const portrait = useIsPortrait();
   const running = status === "playing" || status === "paused";
   const level = getLevel(levelIndex);
 
@@ -202,6 +216,18 @@ export function GameShell() {
                   </button>
                 </>
               )}
+            </div>
+          )}
+
+          {portrait && (
+            <div className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-background/95 p-6 text-center">
+              <RotateCw className="size-10 animate-pulse text-crystal" />
+              <p className="font-pixel text-[10px] leading-relaxed text-foreground sm:text-xs">
+                Rotate your device
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Parth&apos;s Anime Quest plays in horizontal (16:9) mode only.
+              </p>
             </div>
           )}
 
