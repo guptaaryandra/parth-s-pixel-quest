@@ -1,6 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import "@/styles.css";
+import "./font.css";
 import { GameShell } from "@/components/game/GameShell";
 
 function AndroidApp() {
