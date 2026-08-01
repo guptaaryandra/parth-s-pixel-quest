@@ -14,7 +14,7 @@ export function drawPixelTexture(
   scale = 3,
 ) {
   if (scene.textures.exists(key)) return;
-  const w = map[0].length;
+  const w = map[0]!.length;
   const h = map.length;
   const canvasTexture = scene.textures.createCanvas(key, w * scale, h * scale);
   if (!canvasTexture) return;
@@ -22,7 +22,7 @@ export function drawPixelTexture(
   ctx.clearRect(0, 0, w * scale, h * scale);
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
-      const ch = map[y][x];
+      const ch = map[y]![x]!;
       const color = palette[ch];
       if (!color) continue;
       ctx.fillStyle = color;
@@ -248,8 +248,8 @@ export function buildTextures(scene: Phaser.Scene) {
   drawPixelTexture(scene, "parth-jump", heroJump, HERO_PALETTE);
   drawPixelTexture(scene, "monster-a", monsterA, MONSTER_PALETTE);
   drawPixelTexture(scene, "monster-b", monsterB, MONSTER_PALETTE);
-  drawPixelTexture(scene, "coin-a", coinFrames[0], COIN_PALETTE, 4);
-  drawPixelTexture(scene, "coin-b", coinFrames[1], COIN_PALETTE, 4);
+  drawPixelTexture(scene, "coin-a", coinFrames[0]!, COIN_PALETTE, 4);
+  drawPixelTexture(scene, "coin-b", coinFrames[1]!, COIN_PALETTE, 4);
   drawPixelTexture(scene, "crystal", crystal, CRYSTAL_PALETTE, 4);
   drawPixelTexture(scene, "ground", groundTile, GROUND_PALETTE, 4);
   drawPixelTexture(scene, "platform", platformTile, PLATFORM_PALETTE, 4);
