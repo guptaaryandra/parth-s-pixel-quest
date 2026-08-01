@@ -1,73 +1,15 @@
 import Phaser from "phaser";
 import { buildTextures } from "./pixels";
 import { controls, gameBus } from "./state";
+import { buildLayout, getLevel, TOTAL_LEVELS } from "./levels";
+import { sfx } from "./audio";
 
 const TILE = 64;
-const WORLD_W = 40 * TILE;
 const WORLD_H = 760;
 const GROUND_Y = 660;
 const SPAWN = { x: 120, y: 520 };
 
-type Seg = [startTile: number, endTile: number];
-
-const GROUND: Seg[] = [
-  [0, 7],
-  [9, 15],
-  [17, 25],
-  [27, 40],
-];
-
-const PLATFORMS: Array<[x: number, y: number, tiles: number]> = [
-  [4, 540, 3],
-  [8.5, 430, 2],
-  [12, 520, 3],
-  [16, 400, 2],
-  [19, 500, 4],
-  [23.5, 380, 2],
-  [27, 470, 3],
-  [31, 360, 3],
-  [35, 480, 3],
-];
-
-const COINS: Array<[number, number]> = [
-  [3, 600],
-  [4.2, 480],
-  [5, 480],
-  [5.8, 480],
-  [8.8, 370],
-  [9.6, 370],
-  [12.4, 460],
-  [13.2, 460],
-  [16.4, 340],
-  [19.5, 440],
-  [20.5, 440],
-  [21.5, 440],
-  [24, 320],
-  [27.5, 410],
-  [28.5, 410],
-  [31.5, 300],
-  [32.5, 300],
-  [35.5, 420],
-  [36.5, 420],
-  [38, 600],
-];
-
-const CRYSTALS: Array<[number, number]> = [
-  [8.9, 330],
-  [16.5, 300],
-  [23.9, 280],
-  [31.9, 250],
-  [38.5, 590],
-];
-
-const MONSTERS: Array<[x: number, y: number, range: number]> = [
-  [5.5, 600, 140],
-  [11.5, 600, 120],
-  [20, 440, 150],
-  [24, 600, 180],
-  [30, 600, 200],
-  [35.8, 420, 110],
-];
+export type SceneInit = { level?: number; score?: number; lives?: number };
 
 export class GameScene extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Sprite;
@@ -76,12 +18,22 @@ export class GameScene extends Phaser.Scene {
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private score = 0;
   private lives = 3;
+  private levelIndex = 0;
   private crystalsFound = 0;
+  private totalCrystals = 5;
+  private worldWidth = 40 * TILE;
   private invulnerableUntil = 0;
   private finished = false;
+  private wasOnGround = true;
 
   constructor() {
     super("game");
+  }
+
+  init(data: SceneInit) {
+    this.levelIndex = data.level ?? 0;
+    this.score = data.score ?? 0;
+    this.lives = data.lives ?? 3;
   }
 
   preload() {
@@ -89,48 +41,42 @@ export class GameScene extends Phaser.Scene {
   }
 
   create() {
-    this.score = 0;
-    this.lives = 3;
+    const cfg = getLevel(this.levelIndex);
+    const layout = buildLayout(cfg, GROUND_Y);
     this.crystalsFound = 0;
+    this.totalCrystals = layout.crystals.length;
     this.finished = false;
     this.invulnerableUntil = 0;
+    this.worldWidth = cfg.tiles * TILE;
 
-    this.physics.world.setBounds(0, 0, WORLD_W, WORLD_H);
-    this.cameras.main.setBounds(0, 0, WORLD_W, WORLD_H);
+    this.physics.world.setBounds(0, 0, this.worldWidth, WORLD_H);
+    this.cameras.main.setBounds(0, 0, this.worldWidth, WORLD_H);
 
-    this.buildBackground();
+    this.buildBackground(cfg.palette);
     this.buildAnimations();
 
     this.solids = this.physics.add.staticGroup();
 
-    for (const [start, end] of GROUND) {
+    for (const [start, end] of layout.ground) {
       const width = (end - start) * TILE;
       if (width <= 0) continue;
       const tile = this.add
         .tileSprite(start * TILE, GROUND_Y, width, WORLD_H - GROUND_Y, "ground")
         .setOrigin(0, 0);
-      const body = this.add.rectangle(
-        start * TILE + width / 2,
-        GROUND_Y + 16,
-        width,
-        32,
-      );
+      const body = this.add.rectangle(start * TILE + width / 2, GROUND_Y + 16, width, 32);
       this.solids.add(body);
       tile.setDepth(3);
     }
 
-    for (const [tx, y, tiles] of PLATFORMS) {
+    for (const [tx, y, tiles] of layout.platforms) {
       const width = tiles * TILE;
-      this.add
-        .tileSprite(tx * TILE, y, width, 24, "platform")
-        .setOrigin(0, 0)
-        .setDepth(3);
+      this.add.tileSprite(tx * TILE, y, width, 24, "platform").setOrigin(0, 0).setDepth(3);
       const body = this.add.rectangle(tx * TILE + width / 2, y + 8, width, 16);
       this.solids.add(body);
     }
 
     const coins = this.physics.add.staticGroup();
-    for (const [tx, y] of COINS) {
+    for (const [tx, y] of layout.coins) {
       const coin = coins.create(tx * TILE, y, "coin-a") as Phaser.Physics.Arcade.Sprite;
       coin.setDepth(4);
       coin.anims.play("coin-spin");
@@ -145,7 +91,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     const crystals = this.physics.add.staticGroup();
-    for (const [tx, y] of CRYSTALS) {
+    for (const [tx, y] of layout.crystals) {
       const gem = crystals.create(tx * TILE, y, "crystal") as Phaser.Physics.Arcade.Sprite;
       gem.setDepth(4);
       this.tweens.add({
@@ -156,29 +102,19 @@ export class GameScene extends Phaser.Scene {
         repeat: -1,
         ease: "Sine.easeInOut",
       });
-      this.tweens.add({
-        targets: gem,
-        scale: 1.12,
-        duration: 700,
-        yoyo: true,
-        repeat: -1,
-      });
+      this.tweens.add({ targets: gem, scale: 1.12, duration: 700, yoyo: true, repeat: -1 });
     }
 
     this.monsters = this.physics.add.group({ allowGravity: false, immovable: true });
-    for (const [tx, y, range] of MONSTERS) {
-      const monster = this.monsters.create(
-        tx * TILE,
-        y,
-        "monster-a",
-      ) as Phaser.Physics.Arcade.Sprite;
+    const speedUp = 1 - this.levelIndex * 0.1;
+    for (const [tx, y, range] of layout.monsters) {
+      const monster = this.monsters.create(tx * TILE, y, "monster-a") as Phaser.Physics.Arcade.Sprite;
       monster.setDepth(4);
       monster.anims.play("monster-float");
-      monster.setData("dir", 1);
       this.tweens.add({
         targets: monster,
         x: tx * TILE + range,
-        duration: 1600 + range * 4,
+        duration: (1600 + range * 4) * speedUp,
         yoyo: true,
         repeat: -1,
         ease: "Sine.easeInOut",
@@ -198,6 +134,7 @@ export class GameScene extends Phaser.Scene {
       const coin = obj as Phaser.Physics.Arcade.Sprite;
       coin.disableBody(true, true);
       this.score += 10;
+      sfx.coin();
       this.emitState();
       this.pop(coin.x, coin.y, 0xffc94a);
     });
@@ -206,25 +143,30 @@ export class GameScene extends Phaser.Scene {
       gem.disableBody(true, true);
       this.score += 50;
       this.crystalsFound += 1;
+      sfx.crystal();
       this.emitState();
       this.pop(gem.x, gem.y, 0x49c9f5);
-      if (this.crystalsFound >= CRYSTALS.length) this.finish("victory");
+      if (this.crystalsFound >= this.totalCrystals) {
+        this.score += 100 * (this.levelIndex + 1);
+        this.finish(this.levelIndex + 1 >= TOTAL_LEVELS ? "victory" : "levelclear");
+      }
     });
     this.physics.add.overlap(this.player, this.monsters, () => this.hurt());
 
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
     this.cameras.main.setZoom(1.35);
     this.cameras.main.setRoundPixels(true);
+    this.cameras.main.fadeIn(320, 0, 0, 0);
     this.cursors = this.input.keyboard!.createCursorKeys();
     this.emitState();
   }
 
-  private buildBackground() {
+  private buildBackground(palette: ReturnType<typeof getLevel>["palette"]) {
     const g = this.add.graphics().setScrollFactor(0).setDepth(0);
-    g.fillGradientStyle(0x151129, 0x151129, 0x2a1f45, 0x3a2a55, 1);
+    g.fillGradientStyle(palette.skyTop, palette.skyTop, palette.skyBottom, palette.skyBottom, 1);
     g.fillRect(0, 0, 1200, WORLD_H);
 
-    const moon = this.add.circle(820, 170, 54, 0xfdf1c7, 0.92).setScrollFactor(0).setDepth(1);
+    const moon = this.add.circle(820, 170, 54, palette.moon, 0.92).setScrollFactor(0).setDepth(1);
     this.tweens.add({ targets: moon, alpha: 0.7, duration: 2600, yoyo: true, repeat: -1 });
 
     for (let i = 0; i < 70; i++) {
@@ -249,14 +191,28 @@ export class GameScene extends Phaser.Scene {
     }
 
     const hills = this.add.graphics().setScrollFactor(0.25).setDepth(2);
-    hills.fillStyle(0x241c3d, 1);
-    for (let i = 0; i < 10; i++) {
-      hills.fillTriangle(i * 340 - 100, GROUND_Y + 40, i * 340 + 90, 320, i * 340 + 280, GROUND_Y + 40);
+    hills.fillStyle(palette.hillFar, 1);
+    for (let i = 0; i < 14; i++) {
+      hills.fillTriangle(
+        i * 340 - 100,
+        GROUND_Y + 40,
+        i * 340 + 90,
+        320,
+        i * 340 + 280,
+        GROUND_Y + 40,
+      );
     }
     const hills2 = this.add.graphics().setScrollFactor(0.5).setDepth(2);
-    hills2.fillStyle(0x2e2450, 1);
-    for (let i = 0; i < 12; i++) {
-      hills2.fillTriangle(i * 260 - 60, GROUND_Y + 60, i * 260 + 80, 430, i * 260 + 220, GROUND_Y + 60);
+    hills2.fillStyle(palette.hillNear, 1);
+    for (let i = 0; i < 16; i++) {
+      hills2.fillTriangle(
+        i * 260 - 60,
+        GROUND_Y + 60,
+        i * 260 + 80,
+        430,
+        i * 260 + 220,
+        GROUND_Y + 60,
+      );
     }
   }
 
@@ -301,6 +257,7 @@ export class GameScene extends Phaser.Scene {
     if (this.finished || this.time.now < this.invulnerableUntil) return;
     this.invulnerableUntil = this.time.now + 1400;
     this.lives -= 1;
+    sfx.hurt();
     this.emitState();
     this.cameras.main.shake(180, 0.01);
     this.pop(this.player.x, this.player.y, 0xef5f78);
@@ -320,18 +277,23 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  private finish(status: "gameover" | "victory") {
+  private finish(status: "levelclear" | "gameover" | "victory") {
     this.finished = true;
+    if (status === "gameover") sfx.gameOver();
+    else if (status === "victory") sfx.victory();
+    else sfx.levelClear();
     this.emitState(status);
     this.time.delayedCall(60, () => this.scene.pause());
   }
 
-  private emitState(status?: "gameover" | "victory") {
+  private emitState(status?: "levelclear" | "gameover" | "victory") {
     gameBus.emit("state", {
       score: this.score,
       lives: Math.max(0, this.lives),
       crystals: this.crystalsFound,
-      totalCrystals: CRYSTALS.length,
+      totalCrystals: this.totalCrystals,
+      level: this.levelIndex + 1,
+      totalLevels: TOTAL_LEVELS,
       status,
     });
   }
@@ -356,7 +318,11 @@ export class GameScene extends Phaser.Scene {
 
     if (jump && onGround) {
       this.player.setVelocityY(-620);
+      sfx.jump();
     }
+
+    if (onGround && !this.wasOnGround) sfx.land();
+    this.wasOnGround = onGround;
 
     if (!onGround) {
       this.player.setTexture("parth-jump");
@@ -371,7 +337,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     if (this.player.x < 8) this.player.setX(8);
-    if (this.player.x > WORLD_W - 8) this.player.setX(WORLD_W - 8);
+    if (this.player.x > this.worldWidth - 8) this.player.setX(this.worldWidth - 8);
     if (this.player.y > WORLD_H + 60) this.hurt();
   }
 }
