@@ -36,8 +36,10 @@ export function Overlay({
   onPlay,
   onResume,
   onNextLevel,
+  onRetryLevel,
 }: Props) {
   if (status === "playing") return null;
+
 
   if (status === "start") {
     return (
