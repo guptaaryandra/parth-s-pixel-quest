@@ -262,6 +262,8 @@ export function GameShell() {
             onPlay={start}
             onResume={togglePause}
             onNextLevel={nextLevel}
+            onRetryLevel={retryLevel}
+
           />
         </div>
       </div>
