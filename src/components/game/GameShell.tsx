@@ -189,7 +189,18 @@ export function GameShell() {
 
           {(
             <div className="pointer-events-auto absolute right-3 top-3 z-40 flex gap-2">
+              {status !== "start" && (
+                <button
+                  type="button"
+                  onPointerUp={goHome}
+                  aria-label="Go to home screen"
+                  className="touch-manipulation rounded-xl border border-border bg-panel/80 p-2 text-foreground backdrop-blur transition hover:bg-accent"
+                >
+                  <Home size={18} />
+                </button>
+              )}
               <button
+
                 type="button"
                 onPointerUp={() => void toggleFullscreen()}
                 aria-label={fullscreen ? "Exit full screen" : "Enter full screen"}
