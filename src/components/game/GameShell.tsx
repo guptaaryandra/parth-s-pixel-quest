@@ -3,6 +3,7 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowUp,
+  Home,
   Maximize,
   Minimize,
   Pause,
@@ -12,6 +13,7 @@ import {
   Volume2,
   VolumeX,
 } from "lucide-react";
+
 import { PhaserCanvas } from "./PhaserCanvas";
 import { controls, type GameStatus, type StatePatch } from "@/game/state";
 import { getLevel, TOTAL_LEVELS } from "@/game/levels";
@@ -105,8 +107,15 @@ export function GameShell() {
     launch(levelIndex, score, 3);
   };
 
+  const goHome = () => {
+    sfx.click();
+    controls.left = controls.right = controls.jump = false;
+    setStatus("start");
+  };
+
   const togglePause = () =>
     setStatus((s) => (s === "playing" ? "paused" : s === "paused" ? "playing" : s));
+
 
   const toggleMute = () => {
     const next = !muted;
@@ -180,7 +189,18 @@ export function GameShell() {
 
           {(
             <div className="pointer-events-auto absolute right-3 top-3 z-40 flex gap-2">
+              {status !== "start" && (
+                <button
+                  type="button"
+                  onPointerUp={goHome}
+                  aria-label="Go to home screen"
+                  className="touch-manipulation rounded-xl border border-border bg-panel/80 p-2 text-foreground backdrop-blur transition hover:bg-accent"
+                >
+                  <Home size={18} />
+                </button>
+              )}
               <button
+
                 type="button"
                 onPointerUp={() => void toggleFullscreen()}
                 aria-label={fullscreen ? "Exit full screen" : "Enter full screen"}
