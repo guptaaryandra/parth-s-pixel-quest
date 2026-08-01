@@ -129,9 +129,17 @@ export function Overlay({
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <Gem size={14} className="text-crystal" /> Reached {levelName}
       </div>
-      <button type="button" onPointerUp={onPlay} className={cta}>
-        <RotateCcw size={16} /> Play again
-      </button>
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        {!win && (
+          <button type="button" onPointerUp={onRetryLevel} className={cta}>
+            <RotateCcw size={16} /> Retry level {level}
+          </button>
+        )}
+        <button type="button" onPointerUp={onPlay} className={win ? cta : ghost}>
+          <Play size={16} /> {win ? "Play again" : "Start from level 1"}
+        </button>
+      </div>
+
     </div>
   );
 }
