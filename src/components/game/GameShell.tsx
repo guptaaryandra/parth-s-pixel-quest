@@ -1,5 +1,16 @@
-import { useCallback, useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, ArrowUp, Pause, Play, RotateCcw, Volume2, VolumeX } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  ArrowUp,
+  Maximize,
+  Minimize,
+  Pause,
+  Play,
+  RotateCcw,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
 import { PhaserCanvas } from "./PhaserCanvas";
 import { controls, type GameStatus, type StatePatch } from "@/game/state";
 import { getLevel, TOTAL_LEVELS } from "@/game/levels";
@@ -17,6 +28,31 @@ export function GameShell() {
   const [crystals, setCrystals] = useState(0);
   const [totalCrystals, setTotalCrystals] = useState(5);
   const [muted, setMuted] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
+  const frameRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onChange = () => setFullscreen(Boolean(document.fullscreenElement));
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
+  }, []);
+
+  const toggleFullscreen = async () => {
+    sfx.click();
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      } else {
+        await frameRef.current?.requestFullscreen?.();
+        const orientation = screen.orientation as
+          | (ScreenOrientation & { lock?: (o: string) => Promise<void> })
+          | undefined;
+        await orientation?.lock?.("landscape").catch(() => undefined);
+      }
+    } catch {
+      /* fullscreen unavailable */
+    }
+  };
 
   useEffect(() => {
     setMuted(sfx.loadMuted());
@@ -84,9 +120,22 @@ export function GameShell() {
   const level = getLevel(levelIndex);
 
   return (
-    <div className="w-full max-w-5xl">
-      <div className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-glow">
-        <div className="relative aspect-[4/3] w-full sm:aspect-[16/10]">
+    <div className="w-full max-w-6xl">
+      <div
+        ref={frameRef}
+        className={
+          fullscreen
+            ? "relative flex h-screen w-screen items-center justify-center overflow-hidden bg-background"
+            : "relative overflow-hidden rounded-3xl border border-border bg-card shadow-glow"
+        }
+      >
+        <div
+          className={
+            fullscreen
+              ? "relative aspect-video max-h-screen w-full max-w-[calc(100vh*16/9)]"
+              : "relative aspect-video w-full"
+          }
+        >
           {status !== "start" ? (
             <PhaserCanvas
               paused={status !== "playing"}
@@ -117,6 +166,14 @@ export function GameShell() {
 
           {status !== "start" && (
             <div className="pointer-events-auto absolute right-3 top-3 z-40 flex gap-2">
+              <button
+                type="button"
+                onPointerUp={() => void toggleFullscreen()}
+                aria-label={fullscreen ? "Exit full screen" : "Enter full screen"}
+                className="touch-manipulation rounded-xl border border-border bg-panel/80 p-2 text-foreground backdrop-blur transition hover:bg-accent"
+              >
+                {fullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
+              </button>
               <button
                 type="button"
                 onPointerUp={toggleMute}
@@ -163,11 +220,13 @@ export function GameShell() {
         </div>
       </div>
 
+      {!fullscreen && (
       <p className="mt-4 text-center text-xs text-muted-foreground sm:text-sm">
         <ArrowLeft className="inline size-3.5" /> <ArrowRight className="inline size-3.5" /> move
         &nbsp;·&nbsp; <ArrowUp className="inline size-3.5" /> / Space jump &nbsp;·&nbsp; P pause
         &nbsp;·&nbsp; M mute &nbsp;·&nbsp; touch buttons on mobile
       </p>
+      )}
     </div>
   );
 }
