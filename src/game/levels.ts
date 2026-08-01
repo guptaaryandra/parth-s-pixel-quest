@@ -172,13 +172,18 @@ export function buildLayout(cfg: LevelConfig, groundY: number): Layout {
   }
   if (cursor < cfg.tiles) ground.push([Math.min(cursor + 2, cfg.tiles - 6), cfg.tiles]);
 
-  // --- floating platforms spread along the level ---
+  // --- floating platforms: reachable staircase (each hop <= jump height) ---
+  const MAX_RISE = 96; // player can clear ~150px, keep hops comfortable
+  const MIN_Y = groundY - 340;
   const platforms: Platform[] = [];
   const step = (cfg.tiles - 6) / cfg.platforms;
+  let prevY = groundY;
   for (let i = 0; i < cfg.platforms; i++) {
-    const tx = 3 + i * step + pick(-0.5, 0.5);
-    const height = groundY - pickInt(110, 300);
-    platforms.push([Number(tx.toFixed(2)), Math.round(height), pickInt(2, 4)]);
+    const tx = 3 + i * step + pick(-0.3, 0.3);
+    let y = prevY - pickInt(60, MAX_RISE);
+    if (y < MIN_Y) y = groundY - pickInt(60, MAX_RISE); // start a new flight from the ground
+    platforms.push([Number(tx.toFixed(2)), Math.round(y), pickInt(2, 4)]);
+    prevY = y;
   }
 
   // --- coins: clusters above platforms + a few on the ground ---
