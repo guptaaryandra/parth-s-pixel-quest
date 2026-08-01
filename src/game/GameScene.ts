@@ -5,8 +5,8 @@ import { buildLayout, getLevel, TOTAL_LEVELS } from "./levels";
 import { sfx } from "./audio";
 
 const TILE = 64;
-const WORLD_H = 760;
-const GROUND_Y = 660;
+const WORLD_H = 720;
+const GROUND_Y = 620;
 const SPAWN = { x: 120, y: 520 };
 
 export type SceneInit = { level?: number; score?: number; lives?: number };
@@ -166,7 +166,7 @@ export class GameScene extends Phaser.Scene {
     g.fillGradientStyle(palette.skyTop, palette.skyTop, palette.skyBottom, palette.skyBottom, 1);
     g.fillRect(0, 0, 1200, WORLD_H);
 
-    const moon = this.add.circle(820, 170, 54, palette.moon, 0.92).setScrollFactor(0).setDepth(1);
+    const moon = this.add.circle(1120, 160, 54, palette.moon, 0.92).setScrollFactor(0).setDepth(1);
     this.tweens.add({ targets: moon, alpha: 0.7, duration: 2600, yoyo: true, repeat: -1 });
 
     for (let i = 0; i < 70; i++) {
@@ -342,4 +342,4 @@ export class GameScene extends Phaser.Scene {
   }
 }
 
-export const GAME_SIZE = { width: 960, height: WORLD_H };
+export const GAME_SIZE = { width: 1280, height: WORLD_H };
