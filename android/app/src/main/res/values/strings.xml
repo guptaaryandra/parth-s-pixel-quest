@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Parth\'s Anime Quest</string>
+    <string name="title_activity_main">Parth\'s Anime Quest</string>
+    <string name="package_name">com.parth.animequest</string>
+    <string name="custom_url_scheme">com.parth.animequest</string>
+</resources>
