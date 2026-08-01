@@ -65,6 +65,7 @@
   --color-crystal: var(--crystal);
   --color-danger: var(--danger);
   --font-pixel: var(--font-pixel);
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
   --shadow-glow: var(--shadow-glow);
   --background-image-gradient-hero: var(--gradient-hero);
   --background-image-gradient-night: var(--gradient-night);
