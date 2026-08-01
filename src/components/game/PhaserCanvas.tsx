@@ -1,26 +1,25 @@
 import { useEffect, useRef } from "react";
 import type Phaser from "phaser";
-import { gameBus } from "@/game/state";
+import { gameBus, type StatePatch } from "@/game/state";
 
 type Props = {
   paused: boolean;
   restartKey: number;
-  onState: (patch: {
-    score: number;
-    lives: number;
-    crystals: number;
-    totalCrystals: number;
-    status?: "gameover" | "victory";
-  }) => void;
+  level: number;
+  startScore: number;
+  startLives: number;
+  onState: (patch: StatePatch) => void;
 };
 
-export function PhaserCanvas({ paused, restartKey, onState }: Props) {
+export function PhaserCanvas({ paused, restartKey, level, startScore, startLives, onState }: Props) {
   const holder = useRef<HTMLDivElement>(null);
   const gameRef = useRef<Phaser.Game | null>(null);
+  const boot = useRef({ level, startScore, startLives });
+  boot.current = { level, startScore, startLives };
 
   useEffect(() => {
     let cancelled = false;
-    const handler = (patch: Parameters<Props["onState"]>[0]) => onState(patch);
+    const handler = (patch: StatePatch) => onState(patch);
     gameBus.on("state", handler);
 
     void (async () => {
@@ -29,7 +28,7 @@ export function PhaserCanvas({ paused, restartKey, onState }: Props) {
         import("@/game/GameScene"),
       ]);
       if (cancelled || !holder.current) return;
-      gameRef.current = new PhaserLib.Game({
+      const game = new PhaserLib.Game({
         type: PhaserLib.AUTO,
         parent: holder.current,
         backgroundColor: "#151129",
@@ -44,7 +43,12 @@ export function PhaserCanvas({ paused, restartKey, onState }: Props) {
           default: "arcade",
           arcade: { gravity: { x: 0, y: 1500 } },
         },
-        scene: [GameScene],
+      });
+      gameRef.current = game;
+      game.scene.add("game", GameScene, true, {
+        level: boot.current.level,
+        score: boot.current.startScore,
+        lives: boot.current.startLives,
       });
     })();
 
