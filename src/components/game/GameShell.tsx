@@ -107,8 +107,15 @@ export function GameShell() {
     launch(levelIndex, score, 3);
   };
 
+  const goHome = () => {
+    sfx.click();
+    controls.left = controls.right = controls.jump = false;
+    setStatus("start");
+  };
+
   const togglePause = () =>
     setStatus((s) => (s === "playing" ? "paused" : s === "paused" ? "playing" : s));
+
 
   const toggleMute = () => {
     const next = !muted;
