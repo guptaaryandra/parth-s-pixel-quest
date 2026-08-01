@@ -12,7 +12,9 @@ type Props = {
   onPlay: () => void;
   onResume: () => void;
   onNextLevel: () => void;
+  onRetryLevel: () => void;
 };
+
 
 const panel =
   "absolute inset-0 z-30 flex flex-col items-center justify-center gap-5 bg-overlay/85 px-6 text-center backdrop-blur-sm animate-fade-in";
