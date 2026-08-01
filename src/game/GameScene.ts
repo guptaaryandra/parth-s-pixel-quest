@@ -166,7 +166,7 @@ export class GameScene extends Phaser.Scene {
     g.fillGradientStyle(palette.skyTop, palette.skyTop, palette.skyBottom, palette.skyBottom, 1);
     g.fillRect(0, 0, 1200, WORLD_H);
 
-    const moon = this.add.circle(1120, 160, 54, palette.moon, 0.92).setScrollFactor(0).setDepth(1);
+    const moon = this.add.circle(1060, 210, 54, palette.moon, 0.92).setScrollFactor(0).setDepth(1);
     this.tweens.add({ targets: moon, alpha: 0.7, duration: 2600, yoyo: true, repeat: -1 });
 
     for (let i = 0; i < 70; i++) {
