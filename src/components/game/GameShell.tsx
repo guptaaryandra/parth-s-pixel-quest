@@ -3,6 +3,7 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowUp,
+  Home,
   Maximize,
   Minimize,
   Pause,
@@ -12,6 +13,7 @@ import {
   Volume2,
   VolumeX,
 } from "lucide-react";
+
 import { PhaserCanvas } from "./PhaserCanvas";
 import { controls, type GameStatus, type StatePatch } from "@/game/state";
 import { getLevel, TOTAL_LEVELS } from "@/game/levels";
