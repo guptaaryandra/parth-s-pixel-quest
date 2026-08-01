@@ -122,7 +122,7 @@ export class GameScene extends Phaser.Scene {
     for (const [tx, y, tiles] of PLATFORMS) {
       const width = tiles * TILE;
       this.add
-        .tileSprite(tx * TILE, y, width, 16, "platform")
+        .tileSprite(tx * TILE, y, width, 24, "platform")
         .setOrigin(0, 0)
         .setDepth(3);
       const body = this.add.rectangle(tx * TILE + width / 2, y + 8, width, 16);
@@ -213,6 +213,8 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.monsters, () => this.hurt());
 
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
+    this.cameras.main.setZoom(1.35);
+    this.cameras.main.setRoundPixels(true);
     this.cursors = this.input.keyboard!.createCursorKeys();
     this.emitState();
   }
@@ -222,7 +224,7 @@ export class GameScene extends Phaser.Scene {
     g.fillGradientStyle(0x151129, 0x151129, 0x2a1f45, 0x3a2a55, 1);
     g.fillRect(0, 0, 1200, WORLD_H);
 
-    const moon = this.add.circle(940, 110, 54, 0xfdf1c7, 0.92).setScrollFactor(0).setDepth(1);
+    const moon = this.add.circle(820, 170, 54, 0xfdf1c7, 0.92).setScrollFactor(0).setDepth(1);
     this.tweens.add({ targets: moon, alpha: 0.7, duration: 2600, yoyo: true, repeat: -1 });
 
     for (let i = 0; i < 70; i++) {

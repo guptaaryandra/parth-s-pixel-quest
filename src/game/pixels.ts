@@ -229,8 +229,10 @@ const GROUND_PALETTE: Palette = {
 };
 
 const platformTile = [
-  "cccccccccccccccc",
   "cCCCCCCCCCCCCCCc",
+  "cCCCCCCCCCCCCCCc",
+  "cnnnnnnnnnnnnnnc",
+  "cnnnnnnnnnnnnnnc",
   "cnnnnnnnnnnnnnnc",
   "cccccccccccccccc",
 ];
