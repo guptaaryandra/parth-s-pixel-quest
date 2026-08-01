@@ -2,14 +2,16 @@ export type Controls = { left: boolean; right: boolean; jump: boolean };
 
 export const controls: Controls = { left: false, right: false, jump: false };
 
-export type GameStatus = "start" | "playing" | "paused" | "gameover" | "victory";
+export type GameStatus = "start" | "playing" | "paused" | "levelclear" | "gameover" | "victory";
 
-export type GameState = {
+export type StatePatch = {
   score: number;
   lives: number;
   crystals: number;
   totalCrystals: number;
-  status: GameStatus;
+  level: number;
+  totalLevels: number;
+  status?: "levelclear" | "gameover" | "victory";
 };
 
 type Listener = (payload: any) => void;
