@@ -164,7 +164,7 @@ export function GameShell() {
             </>
           )}
 
-          {status !== "start" && (
+          {(
             <div className="pointer-events-auto absolute right-3 top-3 z-40 flex gap-2">
               <button
                 type="button"
