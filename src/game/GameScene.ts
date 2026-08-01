@@ -317,7 +317,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     if (jump && onGround) {
-      this.player.setVelocityY(-620);
+      this.player.setVelocityY(-680);
       sfx.jump();
     }
 

@@ -22,7 +22,7 @@ const base =
 
 export function TouchPad() {
   return (
-    <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex items-end justify-between p-4 sm:hidden">
+    <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex items-end justify-between p-4">
       <div className="pointer-events-auto flex gap-3">
         <button aria-label="Move left" className={base} {...padProps("left")}>
           <ArrowLeft />
