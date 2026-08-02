@@ -106,7 +106,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.monsters = this.physics.add.group({ allowGravity: false, immovable: true });
-    const speedUp = 1 - this.levelIndex * 0.1;
+    const speedUp = Math.max(0.35, 1 - this.levelIndex * 0.014);
     for (const [tx, y, range] of layout.monsters) {
       const monster = this.monsters.create(tx * TILE, y, "monster-a") as Phaser.Physics.Arcade.Sprite;
       monster.setDepth(4);
