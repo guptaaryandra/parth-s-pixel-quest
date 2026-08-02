@@ -320,6 +320,7 @@ export class GameScene extends Phaser.Scene {
 
   private updateLurkers() {
     for (const obj of this.lurkers.getChildren()) {
+      const l = obj as Phaser.Physics.Arcade.Sprite;
       const dist = Math.abs(l.x - this.player.x);
       const popped = l.getData("popped") as boolean;
       if (!popped && dist < 150) {
@@ -340,8 +341,7 @@ export class GameScene extends Phaser.Scene {
           ease: "Sine.easeIn",
         });
       }
-      return true;
-    });
+    }
   }
 
   override update() {
