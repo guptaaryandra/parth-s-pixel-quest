@@ -322,24 +322,33 @@ export class GameScene extends Phaser.Scene {
   private updateLurkers() {
     for (const obj of this.lurkers.getChildren()) {
       const l = obj as Phaser.Physics.Arcade.Sprite;
+      const clip = l.getData("clip") as boolean;
+      const popY = l.getData("popY") as number;
       const dist = Math.abs(l.x - this.player.x);
+      const dy = Math.abs(popY - this.player.y);
+      const near = dist < 150 && (!clip || dy < 120);
+      const far = dist > 320 || (clip && dy > 220);
       const popped = l.getData("popped") as boolean;
-      if (!popped && dist < 150) {
+      if (!popped && near) {
         l.setData("popped", true);
+        if (clip) l.setCrop();
         sfx.hurt();
         this.tweens.add({
           targets: l,
-          y: l.getData("popY") as number,
+          y: popY,
           duration: 200,
           ease: "Back.easeOut",
         });
-      } else if (popped && dist > 320) {
+      } else if (popped && far) {
         l.setData("popped", false);
         this.tweens.add({
           targets: l,
           y: l.getData("homeY") as number,
           duration: 300,
           ease: "Sine.easeIn",
+          onComplete: () => {
+            if (clip) l.setCrop(0, 0, 42, 12);
+          },
         });
       }
     }
