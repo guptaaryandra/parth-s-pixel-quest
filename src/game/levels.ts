@@ -224,5 +224,14 @@ export function buildLayout(cfg: LevelConfig, groundY: number): Layout {
     lurkers.push(Number(pick(run[0] + 1.5, run[1] - 1).toFixed(2)));
   }
 
-  return { ground, platforms, coins, crystals, monsters, lurkers };
+  // --- surprise lurkers hiding on the steps (wider platforms) ---
+  const platformLurkers: Point[] = [];
+  const stepCount = 1 + Math.floor(cfg.id / 5);
+  const wideSteps = platforms.filter(([, , tiles]) => tiles >= 2);
+  for (let i = 0; i < stepCount && wideSteps.length > 0; i++) {
+    const [tx, y, tiles] = wideSteps[(i * 2 + 1) % wideSteps.length]!;
+    platformLurkers.push([Number((tx + tiles / 2).toFixed(2)), y]);
+  }
+
+  return { ground, platforms, coins, crystals, monsters, lurkers, platformLurkers };
 }
