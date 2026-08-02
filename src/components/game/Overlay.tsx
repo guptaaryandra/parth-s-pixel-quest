@@ -1,4 +1,4 @@
-import { ArrowRight, Gem, Play, RotateCcw, Sparkles, Trophy } from "lucide-react";
+import { ArrowRight, Gem, Home, Play, RotateCcw, Sparkles, Trophy } from "lucide-react";
 import type { GameStatus } from "@/game/state";
 
 type Props = {
@@ -13,6 +13,7 @@ type Props = {
   onResume: () => void;
   onNextLevel: () => void;
   onRetryLevel: () => void;
+  onGoHome: () => void;
 };
 
 
@@ -37,6 +38,7 @@ export function Overlay({
   onResume,
   onNextLevel,
   onRetryLevel,
+  onGoHome,
 }: Props) {
   if (status === "playing" || status === "levelselect") return null;
 
@@ -136,10 +138,17 @@ export function Overlay({
             <RotateCcw size={16} /> Retry level {level}
           </button>
         )}
-        <button type="button" onPointerUp={onPlay} className={win ? cta : ghost}>
-          <Play size={16} /> {win ? "Play again" : "Start from level 1"}
-        </button>
+        {win ? (
+          <button type="button" onPointerUp={onPlay} className={cta}>
+            <Play size={16} /> Play again
+          </button>
+        ) : (
+          <button type="button" onPointerUp={onGoHome} className={ghost}>
+            <Home size={16} /> Home
+          </button>
+        )}
       </div>
+
 
     </div>
   );

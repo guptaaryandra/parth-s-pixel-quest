@@ -132,6 +132,8 @@ export type Layout = {
   coins: Point[];
   crystals: Point[];
   monsters: Monster[];
+  /** Surprise pop-up obstacles buried in the ground (tileX only). */
+  lurkers: number[];
 };
 
 /** Builds a playable, deterministic layout for a level config. */
@@ -211,5 +213,14 @@ export function buildLayout(cfg: LevelConfig, groundY: number): Layout {
       monsters.push([tx + 0.4, y - 40, Math.max(60, (tiles - 1) * 64)]),
     );
 
-  return { ground, platforms, coins, crystals, monsters };
+  // --- surprise lurkers buried inside long ground runs ---
+  const lurkers: number[] = [];
+  const lurkerCount = 1 + Math.floor(cfg.id / 6);
+  const longRuns = ground.filter(([s, e]) => e - s >= 4 && s > safeStart);
+  for (let i = 0; i < lurkerCount && longRuns.length > 0; i++) {
+    const run = longRuns[i % longRuns.length]!;
+    lurkers.push(Number(pick(run[0] + 1.5, run[1] - 1).toFixed(2)));
+  }
+
+  return { ground, platforms, coins, crystals, monsters, lurkers };
 }

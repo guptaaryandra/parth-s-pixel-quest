@@ -243,6 +243,33 @@ const PLATFORM_PALETTE: Palette = {
   n: "#463a6b",
 };
 
+/** Surprise "lurker" — hides under the ground with only its horns peeking out. */
+const lurker = [
+  "..............",
+  "...LL....LL...",
+  "..LLLL..LLLL..",
+  ".LLLLLLLLLLLL.",
+  "LLLLLLLLLLLLLL",
+  "LLwwLLLLLLwwLL",
+  "LLwpLLLLLLwpLL",
+  "LLLLLLLLLLLLLL",
+  "LLLtttttttLLLL",
+  "LLLtLtLtLtLLLL",
+  ".LLLLLLLLLLLL.",
+  "..LLLLLLLLLL..",
+  "...LLLLLLLL...",
+  "..LL..LL..LL..",
+  ".LL...LL...LL.",
+  "..............",
+];
+
+const LURKER_PALETTE: Palette = {
+  L: "#5a2340",
+  w: "#fff2b8",
+  p: "#2a1020",
+  t: "#ffd9e8",
+};
+
 export function buildTextures(scene: Phaser.Scene) {
   drawPixelTexture(scene, "parth-idle", heroIdle, HERO_PALETTE);
   drawPixelTexture(scene, "parth-run-a", heroRunA, HERO_PALETTE);
@@ -250,6 +277,7 @@ export function buildTextures(scene: Phaser.Scene) {
   drawPixelTexture(scene, "parth-jump", heroJump, HERO_PALETTE);
   drawPixelTexture(scene, "monster-a", monsterA, MONSTER_PALETTE);
   drawPixelTexture(scene, "monster-b", monsterB, MONSTER_PALETTE);
+  drawPixelTexture(scene, "lurker", lurker, LURKER_PALETTE);
   drawPixelTexture(scene, "coin-a", coinFrames[0]!, COIN_PALETTE, 4);
   drawPixelTexture(scene, "coin-b", coinFrames[1]!, COIN_PALETTE, 4);
   drawPixelTexture(scene, "crystal", crystal, CRYSTAL_PALETTE, 4);
