@@ -136,6 +136,8 @@ export type Layout = {
   lurkers: number[];
   /** Surprise pop-up obstacles hiding on platforms/steps. */
   platformLurkers: Point[];
+  /** Flying monsters that sweep the air. */
+  flyers: Monster[];
 };
 
 /** Builds a playable, deterministic layout for a level config. */
@@ -233,5 +235,31 @@ export function buildLayout(cfg: LevelConfig, groundY: number): Layout {
     platformLurkers.push([Number((tx + tiles / 2).toFixed(2)), y]);
   }
 
-  return { ground, platforms, coins, crystals, monsters, lurkers, platformLurkers };
+  // --- flying monsters: sweep the air above the path ---
+  const flyers: Monster[] = [];
+  const flyerCount = 1 + Math.floor(cfg.id / 7);
+  for (let i = 0; i < flyerCount; i++) {
+    const tx = Number((6 + ((cfg.tiles - 10) * (i + 0.5)) / flyerCount).toFixed(2));
+    const y = Math.round(groundY - pick(170, 300));
+    flyers.push([tx, y, pickInt(cfg.monsterRange[0] + 40, cfg.monsterRange[1] + 90)]);
+  }
+
+  // --- keep the airspace above every surprise monster clear ---
+  const blockers: Point[] = [
+    ...lurkers.map((tx) => [tx, groundY] as Point),
+    ...platformLurkers,
+  ];
+  const clearAbove = (tx: number, y: number) =>
+    !blockers.some(([bx, by]) => Math.abs(tx - bx) < 1.2 && y <= by + 8 && y > by - 260);
+
+  return {
+    ground,
+    platforms,
+    coins: coins.filter(([tx, y]) => clearAbove(tx, y)),
+    crystals: crystals.filter(([tx, y]) => clearAbove(tx, y)),
+    monsters: monsters.filter(([tx, y]) => clearAbove(tx, y)),
+    lurkers,
+    platformLurkers,
+    flyers,
+  };
 }

@@ -270,6 +270,41 @@ const LURKER_PALETTE: Palette = {
   t: "#ffd9e8",
 };
 
+/** Flying shadow bat — two wing frames. */
+const flyerA = [
+  "..............",
+  "ff..........ff",
+  "fFf........fFf",
+  "fFFf..bb..fFFf",
+  ".fFFfbbbbfFFf.",
+  "..fFbbwwbbFf..",
+  "...bbwpwpbb...",
+  "...bbbbbbbb...",
+  "....bb..bb....",
+  "..............",
+];
+
+const flyerB = [
+  "..............",
+  "..............",
+  "....bb..bb....",
+  "ff...bbbb...ff",
+  "fFf.bbbbbb.fFf",
+  "fFFfbbwwbbfFFf",
+  ".fFbbwpwpbbFf.",
+  "..fbbbbbbbbf..",
+  "....bb..bb....",
+  "..............",
+];
+
+const FLYER_PALETTE: Palette = {
+  b: "#2f2545",
+  f: "#4a3a6b",
+  F: "#6b53a0",
+  w: "#fff2b8",
+  p: "#1a1226",
+};
+
 export function buildTextures(scene: Phaser.Scene) {
   drawPixelTexture(scene, "parth-idle", heroIdle, HERO_PALETTE);
   drawPixelTexture(scene, "parth-run-a", heroRunA, HERO_PALETTE);
@@ -278,6 +313,8 @@ export function buildTextures(scene: Phaser.Scene) {
   drawPixelTexture(scene, "monster-a", monsterA, MONSTER_PALETTE);
   drawPixelTexture(scene, "monster-b", monsterB, MONSTER_PALETTE);
   drawPixelTexture(scene, "lurker", lurker, LURKER_PALETTE);
+  drawPixelTexture(scene, "flyer-a", flyerA, FLYER_PALETTE);
+  drawPixelTexture(scene, "flyer-b", flyerB, FLYER_PALETTE);
   drawPixelTexture(scene, "coin-a", coinFrames[0]!, COIN_PALETTE, 4);
   drawPixelTexture(scene, "coin-b", coinFrames[1]!, COIN_PALETTE, 4);
   drawPixelTexture(scene, "crystal", crystal, CRYSTAL_PALETTE, 4);
