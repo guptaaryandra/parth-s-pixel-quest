@@ -134,6 +134,8 @@ export type Layout = {
   monsters: Monster[];
   /** Surprise pop-up obstacles buried in the ground (tileX only). */
   lurkers: number[];
+  /** Surprise pop-up obstacles hiding on platforms/steps. */
+  platformLurkers: Point[];
 };
 
 /** Builds a playable, deterministic layout for a level config. */
