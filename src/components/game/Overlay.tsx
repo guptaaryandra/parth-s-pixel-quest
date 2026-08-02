@@ -38,7 +38,7 @@ export function Overlay({
   onNextLevel,
   onRetryLevel,
 }: Props) {
-  if (status === "playing") return null;
+  if (status === "playing" || status === "levelselect") return null;
 
 
   if (status === "start") {
@@ -53,12 +53,13 @@ export function Overlay({
           <span className="text-gold">Anime Quest</span>
         </h1>
         <p className="max-w-sm text-sm text-muted-foreground">
-          Five worlds of twilight. Gather every glowing crystal, scoop up the coins, and slip past
-          the cute shadow monsters.
+          {totalLevels} worlds of twilight. Gather every glowing crystal, scoop up the coins, and
+          slip past the cute shadow monsters.
         </p>
         <button type="button" onPointerUp={onPlay} className={cta}>
           <Play size={16} /> Play
         </button>
+
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
             <Trophy size={14} className="text-crystal" /> {totalLevels} levels

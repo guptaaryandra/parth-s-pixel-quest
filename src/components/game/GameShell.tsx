@@ -1,11 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  ArrowLeft,
-  ArrowRight,
-  ArrowUp,
   Home,
-  Maximize,
-  Minimize,
+  LayoutGrid,
   Pause,
   Play,
   RotateCcw,
@@ -18,8 +14,10 @@ import { PhaserCanvas } from "./PhaserCanvas";
 import { controls, type GameStatus, type StatePatch } from "@/game/state";
 import { getLevel, TOTAL_LEVELS } from "@/game/levels";
 import { sfx } from "@/game/audio";
+import { completeLevel, loadProgress } from "@/game/progress";
 import { Hud } from "./Hud";
 import { Overlay } from "./Overlay";
+import { LevelSelect } from "./LevelSelect";
 import { TouchPad } from "./TouchPad";
 
 function useIsPortrait() {
@@ -43,48 +41,55 @@ export function GameShell() {
   const [crystals, setCrystals] = useState(0);
   const [totalCrystals, setTotalCrystals] = useState(5);
   const [muted, setMuted] = useState(false);
-  const [fullscreen, setFullscreen] = useState(false);
+  const [unlocked, setUnlocked] = useState(0);
+  const [best, setBest] = useState<Record<number, number>>({});
   const frameRef = useRef<HTMLDivElement>(null);
+  const levelRef = useRef(0);
+  levelRef.current = levelIndex;
 
   useEffect(() => {
-    const onChange = () => setFullscreen(Boolean(document.fullscreenElement));
-    document.addEventListener("fullscreenchange", onChange);
-    return () => document.removeEventListener("fullscreenchange", onChange);
+    setMuted(sfx.loadMuted());
+    const p = loadProgress();
+    setUnlocked(Math.min(p.unlocked, TOTAL_LEVELS - 1));
+    setBest(p.best);
   }, []);
 
-  const toggleFullscreen = async () => {
-    sfx.click();
+  /** Full screen is the default experience — request it on the first user gesture. */
+  const enterFullscreen = () => {
     try {
-      if (document.fullscreenElement) {
-        await document.exitFullscreen();
-      } else {
-        await frameRef.current?.requestFullscreen?.();
-        const orientation = screen.orientation as
-          | (ScreenOrientation & { lock?: (o: string) => Promise<void> })
-          | undefined;
-        await orientation?.lock?.("landscape").catch(() => undefined);
+      if (!document.fullscreenElement) {
+        void frameRef.current?.requestFullscreen?.().catch(() => undefined);
       }
+      const orientation = screen.orientation as
+        | (ScreenOrientation & { lock?: (o: string) => Promise<void> })
+        | undefined;
+      void orientation?.lock?.("landscape").catch(() => undefined);
     } catch {
       /* fullscreen unavailable */
     }
   };
-
-  useEffect(() => {
-    setMuted(sfx.loadMuted());
-  }, []);
 
   const onState = useCallback((patch: StatePatch) => {
     setScore(patch.score);
     setLives(patch.lives);
     setCrystals(patch.crystals);
     setTotalCrystals(patch.totalCrystals);
-    if (patch.status) setStatus(patch.status);
+    if (patch.status) {
+      setStatus(patch.status);
+      if (patch.status === "levelclear" || patch.status === "victory") {
+        const p = completeLevel(levelRef.current, patch.score);
+        setUnlocked(Math.min(p.unlocked, TOTAL_LEVELS - 1));
+        setBest(p.best);
+      }
+    }
   }, []);
 
   const launch = (index: number, carryScore: number, carryLives: number) => {
     controls.left = controls.right = controls.jump = false;
     sfx.unlock();
+    enterFullscreen();
     setLevelIndex(index);
+    levelRef.current = index;
     setScore(carryScore);
     setLives(carryLives);
     setCrystals(0);
@@ -92,9 +97,17 @@ export function GameShell() {
     setStatus("playing");
   };
 
-  const start = () => {
+  const openLevelSelect = () => {
     sfx.click();
-    launch(0, 0, 3);
+    sfx.unlock();
+    enterFullscreen();
+    controls.left = controls.right = controls.jump = false;
+    setStatus("levelselect");
+  };
+
+  const selectLevel = (index: number) => {
+    sfx.click();
+    launch(index, 0, 3);
   };
 
   const nextLevel = () => {
@@ -116,7 +129,6 @@ export function GameShell() {
   const togglePause = () =>
     setStatus((s) => (s === "playing" ? "paused" : s === "paused" ? "playing" : s));
 
-
   const toggleMute = () => {
     const next = !muted;
     sfx.setMuted(next);
@@ -129,7 +141,7 @@ export function GameShell() {
       if (e.key === "p" || e.key === "P") togglePause();
       if (e.key === "m" || e.key === "M") toggleMute();
       if (e.key === "Enter") {
-        if (status === "start" || status === "gameover" || status === "victory") start();
+        if (status === "start" || status === "gameover" || status === "victory") openLevelSelect();
         else if (status === "levelclear") nextLevel();
       }
       if (["ArrowUp", "ArrowDown", " "].includes(e.key)) e.preventDefault();
@@ -140,141 +152,129 @@ export function GameShell() {
 
   const portrait = useIsPortrait();
   const running = status === "playing" || status === "paused";
+  const inGame = running || status === "levelclear" || status === "gameover" || status === "victory";
   const level = getLevel(levelIndex);
 
   return (
-    <div className="w-full max-w-6xl">
-      <div
-        ref={frameRef}
-        className={
-          fullscreen
-            ? "relative flex h-screen w-screen items-center justify-center overflow-hidden bg-background"
-            : "relative overflow-hidden rounded-3xl border border-border bg-card shadow-glow"
-        }
-      >
-        <div
-          className={
-            fullscreen
-              ? "relative aspect-video max-h-screen w-full max-w-[calc(100vh*16/9)]"
-              : "relative aspect-video w-full"
-          }
-        >
-          {status !== "start" ? (
-            <PhaserCanvas
-              paused={status !== "playing"}
-              restartKey={restartKey}
-              level={levelIndex}
-              startScore={score}
-              startLives={lives}
-              onState={onState}
-            />
-          ) : (
-            <div className="h-full w-full bg-gradient-night" />
-          )}
+    <div
+      ref={frameRef}
+      className="fixed inset-0 z-40 flex items-center justify-center overflow-hidden bg-background"
+    >
+      <div className="relative aspect-video max-h-screen w-full max-w-[calc(100vh*16/9)]">
+        {inGame ? (
+          <PhaserCanvas
+            paused={status !== "playing"}
+            restartKey={restartKey}
+            level={levelIndex}
+            startScore={score}
+            startLives={lives}
+            onState={onState}
+          />
+        ) : (
+          <div className="h-full w-full bg-gradient-night" />
+        )}
 
+        {running && (
+          <>
+            <Hud
+              score={score}
+              lives={lives}
+              crystals={crystals}
+              totalCrystals={totalCrystals}
+              level={levelIndex + 1}
+              totalLevels={TOTAL_LEVELS}
+              levelName={level.name}
+            />
+            <TouchPad />
+          </>
+        )}
+
+        <div className="pointer-events-auto absolute right-3 top-3 z-40 flex gap-2">
+          {status !== "start" && (
+            <button
+              type="button"
+              onPointerUp={goHome}
+              aria-label="Go to home screen"
+              className="touch-manipulation rounded-xl border border-border bg-panel/80 p-2 text-foreground backdrop-blur transition hover:bg-accent"
+            >
+              <Home size={18} />
+            </button>
+          )}
+          {status !== "levelselect" && (
+            <button
+              type="button"
+              onPointerUp={openLevelSelect}
+              aria-label="Select level"
+              className="touch-manipulation rounded-xl border border-border bg-panel/80 p-2 text-foreground backdrop-blur transition hover:bg-accent"
+            >
+              <LayoutGrid size={18} />
+            </button>
+          )}
+          <button
+            type="button"
+            onPointerUp={toggleMute}
+            aria-label={muted ? "Unmute sound" : "Mute sound"}
+            className="touch-manipulation rounded-xl border border-border bg-panel/80 p-2 text-foreground backdrop-blur transition hover:bg-accent"
+          >
+            {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+          </button>
           {running && (
             <>
-              <Hud
-                score={score}
-                lives={lives}
-                crystals={crystals}
-                totalCrystals={totalCrystals}
-                level={levelIndex + 1}
-                totalLevels={TOTAL_LEVELS}
-                levelName={level.name}
-              />
-              <TouchPad />
+              <button
+                type="button"
+                onPointerUp={togglePause}
+                aria-label={status === "paused" ? "Resume" : "Pause"}
+                className="touch-manipulation rounded-xl border border-border bg-panel/80 p-2 text-foreground backdrop-blur transition hover:bg-accent"
+              >
+                {status === "paused" ? <Play size={18} /> : <Pause size={18} />}
+              </button>
+              <button
+                type="button"
+                onPointerUp={retryLevel}
+                aria-label="Restart level"
+                className="touch-manipulation rounded-xl border border-border bg-panel/80 p-2 text-foreground backdrop-blur transition hover:bg-accent"
+              >
+                <RotateCcw size={18} />
+              </button>
             </>
           )}
-
-          {(
-            <div className="pointer-events-auto absolute right-3 top-3 z-40 flex gap-2">
-              {status !== "start" && (
-                <button
-                  type="button"
-                  onPointerUp={goHome}
-                  aria-label="Go to home screen"
-                  className="touch-manipulation rounded-xl border border-border bg-panel/80 p-2 text-foreground backdrop-blur transition hover:bg-accent"
-                >
-                  <Home size={18} />
-                </button>
-              )}
-              <button
-
-                type="button"
-                onPointerUp={() => void toggleFullscreen()}
-                aria-label={fullscreen ? "Exit full screen" : "Enter full screen"}
-                className="touch-manipulation rounded-xl border border-border bg-panel/80 p-2 text-foreground backdrop-blur transition hover:bg-accent"
-              >
-                {fullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
-              </button>
-              <button
-                type="button"
-                onPointerUp={toggleMute}
-                aria-label={muted ? "Unmute sound" : "Mute sound"}
-                className="touch-manipulation rounded-xl border border-border bg-panel/80 p-2 text-foreground backdrop-blur transition hover:bg-accent"
-              >
-                {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-              </button>
-              {running && (
-                <>
-                  <button
-                    type="button"
-                    onPointerUp={togglePause}
-                    aria-label={status === "paused" ? "Resume" : "Pause"}
-                    className="touch-manipulation rounded-xl border border-border bg-panel/80 p-2 text-foreground backdrop-blur transition hover:bg-accent"
-                  >
-                    {status === "paused" ? <Play size={18} /> : <Pause size={18} />}
-                  </button>
-                  <button
-                    type="button"
-                    onPointerUp={retryLevel}
-                    aria-label="Restart level"
-                    className="touch-manipulation rounded-xl border border-border bg-panel/80 p-2 text-foreground backdrop-blur transition hover:bg-accent"
-                  >
-                    <RotateCcw size={18} />
-                  </button>
-                </>
-              )}
-            </div>
-          )}
-
-          {portrait && (
-            <div className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-background/95 p-6 text-center">
-              <RotateCw className="size-10 animate-pulse text-crystal" />
-              <p className="font-pixel text-[10px] leading-relaxed text-foreground sm:text-xs">
-                Rotate your device
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Parth&apos;s Anime Quest plays in horizontal (16:9) mode only.
-              </p>
-            </div>
-          )}
-
-          <Overlay
-            status={status}
-            score={score}
-            level={levelIndex + 1}
-            totalLevels={TOTAL_LEVELS}
-            levelName={level.name}
-            levelTagline={level.tagline}
-            nextLevelName={getLevel(levelIndex + 1).name}
-            onPlay={start}
-            onResume={togglePause}
-            onNextLevel={nextLevel}
-            onRetryLevel={retryLevel}
-
-          />
         </div>
-      </div>
 
-      {!fullscreen && (
-      <p className="mt-4 text-center text-xs text-muted-foreground sm:text-sm">
-        <ArrowLeft className="inline size-3.5" /> <ArrowRight className="inline size-3.5" /> move
-        &nbsp;·&nbsp; <ArrowUp className="inline size-3.5" /> / Space jump &nbsp;·&nbsp; P pause
-        &nbsp;·&nbsp; M mute &nbsp;·&nbsp; touch buttons on mobile
-      </p>
-      )}
+        {status === "levelselect" && (
+          <LevelSelect
+            unlocked={unlocked}
+            best={best}
+            onSelect={selectLevel}
+            onBack={goHome}
+          />
+        )}
+
+        {portrait && (
+          <div className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-background/95 p-6 text-center">
+            <RotateCw className="size-10 animate-pulse text-crystal" />
+            <p className="font-pixel text-[10px] leading-relaxed text-foreground sm:text-xs">
+              Rotate your device
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Parth&apos;s Anime Quest plays in horizontal (16:9) mode only.
+            </p>
+          </div>
+        )}
+
+        <Overlay
+          status={status}
+          score={score}
+          level={levelIndex + 1}
+          totalLevels={TOTAL_LEVELS}
+          levelName={level.name}
+          levelTagline={level.tagline}
+          nextLevelName={getLevel(levelIndex + 1).name}
+          onPlay={openLevelSelect}
+          onResume={togglePause}
+          onNextLevel={nextLevel}
+          onRetryLevel={retryLevel}
+        />
+      </div>
     </div>
   );
 }
