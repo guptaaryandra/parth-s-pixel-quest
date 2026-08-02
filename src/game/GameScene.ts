@@ -15,6 +15,8 @@ export class GameScene extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Sprite;
   private monsters!: Phaser.Physics.Arcade.Group;
   private lurkers!: Phaser.Physics.Arcade.Group;
+  private flyers!: Phaser.Physics.Arcade.Group;
+
   private solids!: Phaser.Physics.Arcade.StaticGroup;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private score = 0;
