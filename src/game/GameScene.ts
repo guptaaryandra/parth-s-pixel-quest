@@ -123,6 +123,21 @@ export class GameScene extends Phaser.Scene {
       });
     }
 
+    // Surprise pop-up obstacles: only a sliver of head shows until Parth gets close.
+    this.lurkers = this.physics.add.group({ allowGravity: false, immovable: true });
+    for (const tx of layout.lurkers) {
+      const lurker = this.lurkers.create(
+        tx * TILE,
+        GROUND_Y + 16,
+        "lurker",
+      ) as Phaser.Physics.Arcade.Sprite;
+      lurker.setDepth(2);
+      lurker.setData("popped", false);
+      lurker.setData("homeY", GROUND_Y + 16);
+      lurker.setData("popY", GROUND_Y - 22);
+      lurker.body?.setSize(30, 24);
+    }
+
     this.player = this.physics.add.sprite(SPAWN.x, SPAWN.y, "parth-idle");
     this.player.setDepth(5);
     this.player.setCollideWorldBounds(false);
@@ -152,6 +167,10 @@ export class GameScene extends Phaser.Scene {
       }
     });
     this.physics.add.overlap(this.player, this.monsters, () => this.hurt());
+    this.physics.add.overlap(this.player, this.lurkers, (_p, obj) => {
+      if ((obj as Phaser.Physics.Arcade.Sprite).getData("popped")) this.hurt();
+    });
+
 
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
     this.cameras.main.setZoom(1.35);
