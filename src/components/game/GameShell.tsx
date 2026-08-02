@@ -273,6 +273,7 @@ export function GameShell() {
           onResume={togglePause}
           onNextLevel={nextLevel}
           onRetryLevel={retryLevel}
+          onGoHome={goHome}
         />
       </div>
     </div>
