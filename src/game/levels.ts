@@ -132,6 +132,8 @@ export type Layout = {
   coins: Point[];
   crystals: Point[];
   monsters: Monster[];
+  /** Surprise pop-up obstacles buried in the ground (tileX only). */
+  lurkers: number[];
 };
 
 /** Builds a playable, deterministic layout for a level config. */
