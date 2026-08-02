@@ -141,6 +141,35 @@ export class GameScene extends Phaser.Scene {
     for (const tx of layout.lurkers) addLurker(tx * TILE, GROUND_Y + 2, false);
     for (const [tx, y] of layout.platformLurkers) addLurker(tx * TILE, y, true);
 
+    // Flying monsters sweeping the air.
+    this.flyers = this.physics.add.group({ allowGravity: false, immovable: true });
+    for (const [tx, y, range] of layout.flyers) {
+      const flyer = this.flyers.create(tx * TILE, y, "flyer-a") as Phaser.Physics.Arcade.Sprite;
+      flyer.setDepth(4);
+      flyer.anims.play("flyer-flap");
+      flyer.body?.setSize(34, 22);
+      this.tweens.add({
+        targets: flyer,
+        x: tx * TILE + range,
+        duration: (1500 + range * 5) * speedUp,
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.easeInOut",
+        onYoyo: () => flyer.setFlipX(true),
+        onRepeat: () => flyer.setFlipX(false),
+      });
+      this.tweens.add({
+        targets: flyer,
+        y: y + Phaser.Math.Between(28, 60),
+        duration: Phaser.Math.Between(900, 1600),
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.easeInOut",
+      });
+    }
+
+
+
 
     this.player = this.physics.add.sprite(SPAWN.x, SPAWN.y, "parth-idle");
     this.player.setDepth(5);
@@ -257,6 +286,12 @@ export class GameScene extends Phaser.Scene {
         key: "monster-float",
         frames: [{ key: "monster-a" }, { key: "monster-b" }],
         frameRate: 4,
+        repeat: -1,
+      });
+      this.anims.create({
+        key: "flyer-flap",
+        frames: [{ key: "flyer-a" }, { key: "flyer-b" }],
+        frameRate: 8,
         repeat: -1,
       });
     }
