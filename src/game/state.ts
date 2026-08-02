@@ -2,7 +2,14 @@ export type Controls = { left: boolean; right: boolean; jump: boolean };
 
 export const controls: Controls = { left: false, right: false, jump: false };
 
-export type GameStatus = "start" | "playing" | "paused" | "levelclear" | "gameover" | "victory";
+export type GameStatus =
+  | "start"
+  | "levelselect"
+  | "playing"
+  | "paused"
+  | "levelclear"
+  | "gameover"
+  | "victory";
 
 export type StatePatch = {
   score: number;
