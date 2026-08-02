@@ -200,6 +200,7 @@ export class GameScene extends Phaser.Scene {
       }
     });
     this.physics.add.overlap(this.player, this.monsters, () => this.hurt());
+    this.physics.add.overlap(this.player, this.flyers, () => this.hurt());
     this.physics.add.overlap(this.player, this.lurkers, (_p, obj) => {
       if ((obj as Phaser.Physics.Arcade.Sprite).getData("popped")) this.hurt();
     });
