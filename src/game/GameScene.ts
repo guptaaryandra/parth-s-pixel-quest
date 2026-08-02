@@ -126,18 +126,19 @@ export class GameScene extends Phaser.Scene {
 
     // Surprise pop-up obstacles: only a sliver of head shows until Parth gets close.
     this.lurkers = this.physics.add.group({ allowGravity: false, immovable: true });
-    for (const tx of layout.lurkers) {
-      const lurker = this.lurkers.create(
-        tx * TILE,
-        GROUND_Y + 16,
-        "lurker",
-      ) as Phaser.Physics.Arcade.Sprite;
-      lurker.setDepth(2);
+    const addLurker = (x: number, surfaceY: number, clip: boolean) => {
+      const lurker = this.lurkers.create(x, surfaceY + 14, "lurker") as Phaser.Physics.Arcade.Sprite;
+      lurker.setDepth(clip ? 4 : 2);
       lurker.setData("popped", false);
-      lurker.setData("homeY", GROUND_Y + 16);
-      lurker.setData("popY", GROUND_Y - 22);
+      lurker.setData("homeY", surfaceY + 14);
+      lurker.setData("popY", surfaceY - 24);
+      lurker.setData("clip", clip);
       lurker.body?.setSize(30, 24);
-    }
+      if (clip) lurker.setCrop(0, 0, 42, 12);
+    };
+    for (const tx of layout.lurkers) addLurker(tx * TILE, GROUND_Y + 2, false);
+    for (const [tx, y] of layout.platformLurkers) addLurker(tx * TILE, y, true);
+
 
     this.player = this.physics.add.sprite(SPAWN.x, SPAWN.y, "parth-idle");
     this.player.setDepth(5);
