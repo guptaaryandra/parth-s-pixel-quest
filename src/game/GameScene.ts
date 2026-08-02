@@ -319,8 +319,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private updateLurkers() {
-    this.lurkers.children.each((obj) => {
-      const l = obj as Phaser.Physics.Arcade.Sprite;
+    for (const obj of this.lurkers.getChildren()) {
       const dist = Math.abs(l.x - this.player.x);
       const popped = l.getData("popped") as boolean;
       if (!popped && dist < 150) {
