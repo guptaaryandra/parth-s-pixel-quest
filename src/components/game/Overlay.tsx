@@ -136,10 +136,17 @@ export function Overlay({
             <RotateCcw size={16} /> Retry level {level}
           </button>
         )}
-        <button type="button" onPointerUp={onPlay} className={win ? cta : ghost}>
-          <Play size={16} /> {win ? "Play again" : "Start from level 1"}
-        </button>
+        {win ? (
+          <button type="button" onPointerUp={onPlay} className={cta}>
+            <Play size={16} /> Play again
+          </button>
+        ) : (
+          <button type="button" onPointerUp={onGoHome} className={ghost}>
+            <Home size={16} /> Home
+          </button>
+        )}
       </div>
+
 
     </div>
   );
