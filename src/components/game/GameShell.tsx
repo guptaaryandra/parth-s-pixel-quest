@@ -6,6 +6,7 @@ import {
   Play,
   RotateCcw,
   RotateCw,
+  ShoppingBag,
   Volume2,
   VolumeX,
 } from "lucide-react";
@@ -15,9 +16,17 @@ import { controls, type GameStatus, type StatePatch } from "@/game/state";
 import { getLevel, TOTAL_LEVELS } from "@/game/levels";
 import { sfx } from "@/game/audio";
 import { completeLevel, loadProgress } from "@/game/progress";
+import {
+  buyItem,
+  equipOutfit,
+  hasPower,
+  loadShop,
+  type ShopState,
+} from "@/game/shop";
 import { Hud } from "./Hud";
 import { Overlay } from "./Overlay";
 import { LevelSelect } from "./LevelSelect";
+import { Shop } from "./Shop";
 import { TouchPad } from "./TouchPad";
 
 function useIsPortrait() {
@@ -38,11 +47,14 @@ export function GameShell() {
   const [levelIndex, setLevelIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
+  const [maxLives, setMaxLives] = useState(3);
   const [crystals, setCrystals] = useState(0);
   const [totalCrystals, setTotalCrystals] = useState(5);
   const [muted, setMuted] = useState(false);
   const [unlocked, setUnlocked] = useState(0);
   const [best, setBest] = useState<Record<number, number>>({});
+  const [shop, setShop] = useState<ShopState>({ coins: 0, owned: ["default"], outfit: "default" });
+  const [shielded, setShielded] = useState(false);
   const frameRef = useRef<HTMLDivElement>(null);
   const levelRef = useRef(0);
   levelRef.current = levelIndex;
@@ -52,7 +64,13 @@ export function GameShell() {
     const p = loadProgress();
     setUnlocked(Math.min(p.unlocked, TOTAL_LEVELS - 1));
     setBest(p.best);
+    const s = loadShop();
+    setShop(s);
+    const startLives = 3 + (hasPower(s, "extra-heart") ? 1 : 0);
+    setMaxLives(startLives);
+    setLives(startLives);
   }, []);
+
 
   /** Full screen is the default experience — request it on the first user gesture. */
   const enterFullscreen = () => {
