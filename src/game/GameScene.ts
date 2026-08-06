@@ -276,8 +276,10 @@ export class GameScene extends Phaser.Scene {
     let zoom = height / VIEW_H;
     if (width / zoom > MAX_VIEW_W) zoom = width / MAX_VIEW_W;
     if (width / zoom < MIN_VIEW_W) zoom = width / MIN_VIEW_W;
-    // Snap to quarter steps for stable, non-shimmering pixels.
-    zoom = Math.max(0.5, Math.round(zoom * 4) / 4);
+    // Snap to 1/8 steps: fine enough to fit any screen, coarse enough that
+    // pixel edges stay stable (no shimmering) while scrolling.
+    zoom = Math.max(0.5, Math.round(zoom * 8) / 8);
+
     this.cameras.main.setZoom(zoom);
     this.layoutBackdrop();
   }
