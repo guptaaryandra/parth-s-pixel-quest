@@ -92,6 +92,7 @@ const heroRunA = [
   ".bbb.......bbb",
 ];
 
+/** Passing pose: legs together under the body (mid-stride). */
 const heroRunB = [
   "....hhhhhh....",
   "...hhhhhhhh...",
@@ -110,6 +111,47 @@ const heroRunB = [
   "....pp.pp.....",
   "...bbb.bbb....",
 ];
+
+/** Opposite stride: rear leg extended back, front leg tucked up. */
+const heroRunC = [
+  "....hhhhhh....",
+  "...hhhhhhhh...",
+  "..hHhhhhhhHh..",
+  "..hssssssssh..",
+  "..hsesssssesh.",
+  "...ssssssssh..",
+  "...ssssssss...",
+  "...rrrrrrrr...",
+  "...cccccccc...",
+  "...cccccccccs.",
+  ".sccccCCcccs..",
+  "...cccCCccc...",
+  "....pppppp....",
+  "...pp..ppp....",
+  "..pp....pp....",
+  ".bbb.....bbb..",
+];
+
+/** Second passing pose, knees lifted the other way. */
+const heroRunD = [
+  "....hhhhhh....",
+  "...hhhhhhhh...",
+  "..hHhhhhhhHh..",
+  "..hssssssssh..",
+  "..hsesssssesh.",
+  "...ssssssssh..",
+  "...ssssssss...",
+  "....rrrrrrr...",
+  "...cccccccc...",
+  "..scccccccc...",
+  "..scccCCcccs..",
+  "...cccCCccc...",
+  "....pppppp....",
+  "....ppppp.....",
+  "...pp..pp.....",
+  "..bbb..bbb....",
+];
+
 
 const heroJump = [
   "....hhhhhh....",
