@@ -358,13 +358,14 @@ export class GameScene extends Phaser.Scene {
     // Hills keep their world-space footing (based at the ground line) while
     // following the camera horizontally with parallax tile offsets.
     if (this.hillFar) {
-      this.hillFar.setPosition(x, GROUND_Y + 40).setSize(w, 300);
+      this.hillFar.setPosition(x, GROUND_Y + 40).setSize(w, 210);
       this.hillFar.tilePositionX = cam.scrollX * 0.75 + x * 0.25;
     }
     if (this.hillNear) {
-      this.hillNear.setPosition(x, GROUND_Y + 60).setSize(w, 230);
+      this.hillNear.setPosition(x, GROUND_Y + 60).setSize(w, 320);
       this.hillNear.tilePositionX = cam.scrollX * 0.5 + x * 0.5;
     }
+
   }
 
 
