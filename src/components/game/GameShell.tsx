@@ -30,7 +30,7 @@ import {
   saveLayout,
   type ControlsLayout,
 } from "@/game/settings";
-import { keepLandscape, lockLandscape, requestFullscreen } from "@/game/orientation";
+import { fallbackRotation, keepLandscape, lockLandscape, requestFullscreen } from "@/game/orientation";
 import { Hud } from "./Hud";
 import { Overlay } from "./Overlay";
 import { LevelSelect } from "./LevelSelect";
