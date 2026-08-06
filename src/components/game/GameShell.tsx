@@ -90,8 +90,11 @@ export function GameShell() {
   const onState = useCallback((patch: StatePatch) => {
     setScore(patch.score);
     setLives(patch.lives);
+    setMaxLives(patch.maxLives);
     setCrystals(patch.crystals);
     setTotalCrystals(patch.totalCrystals);
+    setShielded(patch.shielded);
+    setShop((s) => (s.coins === patch.wallet ? s : { ...s, coins: patch.wallet }));
     if (patch.status) {
       setStatus(patch.status);
       if (patch.status === "levelclear" || patch.status === "victory") {
@@ -115,6 +118,8 @@ export function GameShell() {
     setStatus("playing");
   };
 
+  const freshLives = () => 3 + (hasPower(loadShop(), "extra-heart") ? 1 : 0);
+
   const openLevelSelect = () => {
     sfx.click();
     sfx.unlock();
@@ -123,9 +128,27 @@ export function GameShell() {
     setStatus("levelselect");
   };
 
+  const openShop = () => {
+    sfx.click();
+    sfx.unlock();
+    controls.left = controls.right = controls.jump = false;
+    setShop(loadShop());
+    setStatus("shop");
+  };
+
+  const purchase = (id: string, price: number) => {
+    sfx.crystal();
+    setShop(buyItem(id, price));
+  };
+
+  const equip = (id: string) => {
+    sfx.click();
+    setShop(equipOutfit(id));
+  };
+
   const selectLevel = (index: number) => {
     sfx.click();
-    launch(index, 0, 3);
+    launch(index, 0, freshLives());
   };
 
   const nextLevel = () => {
@@ -135,7 +158,7 @@ export function GameShell() {
 
   const retryLevel = () => {
     sfx.click();
-    launch(levelIndex, score, 3);
+    launch(levelIndex, score, freshLives());
   };
 
   const goHome = () => {
@@ -143,6 +166,7 @@ export function GameShell() {
     controls.left = controls.right = controls.jump = false;
     setStatus("start");
   };
+
 
   const togglePause = () =>
     setStatus((s) => (s === "playing" ? "paused" : s === "paused" ? "playing" : s));
