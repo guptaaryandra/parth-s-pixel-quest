@@ -628,16 +628,17 @@ export class GameScene extends Phaser.Scene {
       // Very small lean into the arc — no per-frame scaling.
       this.player.setAngle(Phaser.Math.Clamp(body.velocity.y * 0.008, -3, 3) * (this.player.flipX ? -1 : 1));
     } else if (left || right) {
-      if (this.player.anims.currentAnim?.key !== "parth-run") {
+      if (!this.player.anims.isPlaying || this.player.anims.currentAnim?.key !== "parth-run") {
         this.player.anims.play("parth-run", true);
-        this.player.setAngle(0);
       }
+      if (this.player.angle !== 0) this.player.setAngle(0);
       // The leg frames carry the run; no tilt or bob writes each frame.
-    } else if (this.player.anims.currentAnim || this.player.texture.key !== "parth-idle") {
+    } else if (this.player.texture.key !== "parth-idle") {
       this.player.anims.stop();
       this.player.setTexture("parth-idle");
       this.player.setAngle(0);
     }
+
 
 
 
