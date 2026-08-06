@@ -536,6 +536,7 @@ export class Backdrop {
     const s = this.scene;
     const b = this.biome;
     const gy = this.groundY;
+    (window as unknown as Record<string, unknown>)['__bd'] = this;
 
     this.sky = s.add.image(0, 0, this.skyKey()).setOrigin(0, 0).setDepth(-4);
     this.stars = s.add.tileSprite(0, 0, TW, TW, this.starsKey()).setOrigin(0, 0).setDepth(-3).setAlpha(0.9);
