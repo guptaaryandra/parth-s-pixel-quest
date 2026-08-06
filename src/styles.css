@@ -187,3 +187,21 @@
 @utility animate-fade-in {
   animation: fade-in 0.35s ease-out both;
 }
+
+@keyframes drift {
+  from { background-position-x: 0; }
+  to { background-position-x: -640px; }
+}
+
+@utility animate-drift-slow {
+  animation: drift 180s linear infinite;
+}
+
+@utility animate-drift-mid {
+  animation: drift 110s linear infinite;
+}
+
+@utility animate-drift-fast {
+  animation: drift 70s linear infinite;
+}
+
