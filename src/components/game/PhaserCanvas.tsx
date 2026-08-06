@@ -36,6 +36,11 @@ export function PhaserCanvas({ paused, restartKey, level, startScore, startLives
         width: GAME_SIZE.width,
         height: GAME_SIZE.height,
         pixelArt: true,
+        render: {
+          antialias: false,
+          roundPixels: true,
+          powerPreference: "high-performance",
+        },
         scale: {
           // NONE: we size the canvas ourselves from the container box (the stage
           // can be CSS-rotated), so the view fills the screen 1:1 — never stretched.
@@ -57,6 +62,7 @@ export function PhaserCanvas({ paused, restartKey, level, startScore, startLives
       // The stage can be CSS-rotated, so trust its layout box rather than the
       // browser orientation. Resize the renderer and camera together at the
       // exact container ratio; CSS never scales the canvas afterward.
+      let queued = 0;
       const fit = () => {
         const el = holder.current;
         if (!el) return;
@@ -66,10 +72,19 @@ export function PhaserCanvas({ paused, restartKey, level, startScore, startLives
           game.scale.resize(w, h);
         }
       };
-      // Wait one frame for a rotated mobile stage to receive its final box.
-      requestAnimationFrame(fit);
-      observer = new ResizeObserver(fit);
+      // Coalesce bursts of resize events (rotation, keyboard, browser chrome)
+      // into a single fit per animation frame.
+      const scheduleFit = () => {
+        if (queued) return;
+        queued = requestAnimationFrame(() => {
+          queued = 0;
+          fit();
+        });
+      };
+      scheduleFit();
+      observer = new ResizeObserver(scheduleFit);
       observer.observe(holder.current);
+
     })();
 
     return () => {
