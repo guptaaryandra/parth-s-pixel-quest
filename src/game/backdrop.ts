@@ -565,7 +565,7 @@ export class Backdrop {
       .setDepth(1);
 
     this.treesMid = s.add
-      .tileSprite(0, 0, TW, 300, this.treeBand("treesMid", 300, shade(b.mid, 0.08), 5, 1.05))
+      .tileSprite(0, 0, TW, 300, this.treeBand("treesMid", 300, 0xff00ff, 5, 1.05))
       .setOrigin(0, 1)
       .setDepth(2);
 
