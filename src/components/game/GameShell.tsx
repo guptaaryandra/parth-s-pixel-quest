@@ -62,6 +62,7 @@ export function GameShell() {
   const [lives, setLives] = useState(3);
   const [maxLives, setMaxLives] = useState(3);
   const [crystals, setCrystals] = useState(0);
+  const [runCoins, setRunCoins] = useState(0);
   const [totalCrystals, setTotalCrystals] = useState(5);
   const [muted, setMuted] = useState(false);
   const [unlocked, setUnlocked] = useState(0);
@@ -106,6 +107,7 @@ export function GameShell() {
     setLives(patch.lives);
     setMaxLives(patch.maxLives);
     setCrystals(patch.crystals);
+    setRunCoins(patch.runCoins);
     setTotalCrystals(patch.totalCrystals);
     setShielded(patch.shielded);
     setShop((s) => (s.coins === patch.wallet ? s : { ...s, coins: patch.wallet }));
@@ -128,6 +130,7 @@ export function GameShell() {
     setScore(carryScore);
     setLives(carryLives);
     setCrystals(0);
+    setRunCoins(0);
     setRestartKey((k) => k + 1);
     setStatus("playing");
   };
@@ -276,7 +279,7 @@ export function GameShell() {
               level={levelIndex + 1}
               totalLevels={TOTAL_LEVELS}
               levelName={level.name}
-              wallet={shop.coins}
+              runCoins={runCoins}
               shielded={shielded}
             />
             <TouchPad layout={layout} />

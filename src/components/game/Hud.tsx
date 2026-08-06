@@ -9,7 +9,7 @@ type Props = {
   level: number;
   totalLevels: number;
   levelName: string;
-  wallet: number;
+  runCoins: number;
   shielded: boolean;
 };
 
@@ -22,7 +22,7 @@ export function Hud({
   level,
   totalLevels,
   levelName,
-  wallet,
+  runCoins,
   shielded,
 }: Props) {
   return (
@@ -53,7 +53,7 @@ export function Hud({
       )}
       <div className="flex items-center gap-1.5 rounded-xl border border-border bg-panel/80 px-3 py-1.5 backdrop-blur">
         <Coins size={14} className="text-gold" />
-        <span className="font-pixel text-[10px] text-gold tabular-nums">{wallet}</span>
+        <span className="font-pixel text-[10px] text-gold tabular-nums">{runCoins}</span>
       </div>
       <div className="rounded-xl border border-border bg-panel/80 px-3 py-1.5 backdrop-blur">
         <span className="font-pixel text-[10px] text-crystal tabular-nums">
