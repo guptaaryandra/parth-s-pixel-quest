@@ -341,8 +341,49 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  /** Aura shield perk: a glowing ring that soaks the first hit of the level. */
+  private addShieldRing() {
+    this.shieldRing = this.add.circle(this.player.x, this.player.y, 32, 0x7de1ff, 0.18).setDepth(4);
+    this.shieldRing.setStrokeStyle(2, 0x7de1ff, 0.8);
+    this.tweens.add({
+      targets: this.shieldRing,
+      scale: 1.12,
+      alpha: 0.5,
+      duration: 900,
+      yoyo: true,
+      repeat: -1,
+    });
+  }
+
+  /** Coin magnet perk: pulls nearby coins toward Parth. */
+  private updateMagnet() {
+    if (!this.magnet) return;
+    for (const obj of this.coins.getChildren()) {
+      const coin = obj as Phaser.Physics.Arcade.Sprite;
+      if (!coin.active) continue;
+      const d = Phaser.Math.Distance.Between(coin.x, coin.y, this.player.x, this.player.y);
+      if (d > 170 || d < 4) continue;
+      const t = 0.14;
+      coin.setPosition(
+        coin.x + (this.player.x - coin.x) * t,
+        coin.y + (this.player.y - coin.y) * t,
+      );
+      coin.body?.reset(coin.x, coin.y);
+    }
+  }
+
   private hurt() {
     if (this.finished || this.time.now < this.invulnerableUntil) return;
+    if (this.shielded) {
+      this.shielded = false;
+      this.invulnerableUntil = this.time.now + 1200;
+      this.shieldRing?.destroy();
+      this.shieldRing = undefined;
+      sfx.hurt();
+      this.pop(this.player.x, this.player.y, 0x7de1ff);
+      this.emitState();
+      return;
+    }
     this.invulnerableUntil = this.time.now + 1400;
     this.lives -= 1;
     sfx.hurt();
@@ -378,13 +419,17 @@ export class GameScene extends Phaser.Scene {
     gameBus.emit("state", {
       score: this.score,
       lives: Math.max(0, this.lives),
+      maxLives: this.maxLives,
       crystals: this.crystalsFound,
       totalCrystals: this.totalCrystals,
       level: this.levelIndex + 1,
       totalLevels: TOTAL_LEVELS,
+      wallet: this.wallet,
+      shielded: this.shielded,
       status,
     });
   }
+
 
   private updateLurkers() {
     for (const obj of this.lurkers.getChildren()) {
