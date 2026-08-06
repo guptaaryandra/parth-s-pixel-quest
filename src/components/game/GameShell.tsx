@@ -313,6 +313,17 @@ export function GameShell() {
               <ShoppingBag size={18} />
             </button>
           )}
+          {status !== "settings" && (
+            <button
+              type="button"
+              onPointerUp={openSettings}
+              aria-label="Controls settings"
+              className="touch-manipulation rounded-xl border border-border bg-panel/80 p-2 text-foreground backdrop-blur transition hover:bg-accent"
+            >
+              <Settings2 size={18} />
+            </button>
+          )}
+
 
           <button
             type="button"
