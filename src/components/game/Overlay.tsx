@@ -1,4 +1,14 @@
-import { ArrowRight, Gem, Home, Play, RotateCcw, Sparkles, Trophy } from "lucide-react";
+import {
+  ArrowRight,
+  Coins,
+  Gem,
+  Home,
+  Play,
+  RotateCcw,
+  ShoppingBag,
+  Sparkles,
+  Trophy,
+} from "lucide-react";
 import type { GameStatus } from "@/game/state";
 
 type Props = {
@@ -9,7 +19,9 @@ type Props = {
   levelName: string;
   levelTagline: string;
   nextLevelName: string;
+  wallet: number;
   onPlay: () => void;
+  onShop: () => void;
   onResume: () => void;
   onNextLevel: () => void;
   onRetryLevel: () => void;
@@ -34,13 +46,15 @@ export function Overlay({
   levelName,
   levelTagline,
   nextLevelName,
+  wallet,
   onPlay,
+  onShop,
   onResume,
   onNextLevel,
   onRetryLevel,
   onGoHome,
 }: Props) {
-  if (status === "playing" || status === "levelselect") return null;
+  if (status === "playing" || status === "levelselect" || status === "shop") return null;
 
 
   if (status === "start") {
@@ -58,9 +72,14 @@ export function Overlay({
           {totalLevels} worlds of twilight. Gather every glowing crystal, scoop up the coins, and
           slip past the cute shadow monsters.
         </p>
-        <button type="button" onPointerUp={onPlay} className={cta}>
-          <Play size={16} /> Play
-        </button>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <button type="button" onPointerUp={onPlay} className={cta}>
+            <Play size={16} /> Play
+          </button>
+          <button type="button" onPointerUp={onShop} className={ghost}>
+            <ShoppingBag size={16} /> Shop
+          </button>
+        </div>
 
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
@@ -69,10 +88,14 @@ export function Overlay({
           <span className="flex items-center gap-1.5">
             <Sparkles size={14} className="text-gold" /> 3 lives
           </span>
+          <span className="flex items-center gap-1.5">
+            <Coins size={14} className="text-gold" /> {wallet} banked
+          </span>
         </div>
       </div>
     );
   }
+
 
   if (status === "paused") {
     return (
