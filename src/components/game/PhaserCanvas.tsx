@@ -37,9 +37,9 @@ export function PhaserCanvas({ paused, restartKey, level, startScore, startLives
         height: GAME_SIZE.height,
         pixelArt: true,
         scale: {
-          // RESIZE: the canvas matches the container exactly, so the view fills
-          // the screen edge-to-edge without ever stretching the pixel art.
-          mode: PhaserLib.Scale.RESIZE,
+          // NONE: we size the canvas ourselves from the container box (the stage
+          // can be CSS-rotated), so the view fills the screen 1:1 — never stretched.
+          mode: PhaserLib.Scale.NONE,
           autoCenter: PhaserLib.Scale.NO_CENTER,
         },
         physics: {
