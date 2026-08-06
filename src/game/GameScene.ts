@@ -250,13 +250,18 @@ export class GameScene extends Phaser.Scene {
   }
 
   /**
-   * Fills the canvas without stretching: the canvas keeps the device aspect
-   * ratio and we zoom just enough that the view never shows past the world.
+   * Responsive ("expand") scaling, the way modern mobile games do it:
+   * the vertical field of view is fixed to the design height, so the pixel
+   * scale is identical on every device — no stretching, no zoom-to-fill.
+   * Wider aspect ratios simply reveal more world horizontally.
+   * The only clamp is a max horizontal view so ultra-wide screens (21:9,
+   * foldables) can't see further than the level design intends.
    */
   private applyZoom() {
     const { width, height } = this.scale.gameSize;
     if (!width || !height) return;
-    const zoom = Math.max(1.35, height / WORLD_H, width / 1600);
+    const MAX_VIEW_W = 1600; // world px visible at most
+    const zoom = Math.max(height / WORLD_H, width / MAX_VIEW_W);
     this.cameras.main.setZoom(zoom);
   }
 
