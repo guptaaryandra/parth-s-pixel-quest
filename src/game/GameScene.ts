@@ -3,6 +3,7 @@ import { buildTextures } from "./pixels";
 import { controls, gameBus } from "./state";
 import { buildLayout, getLevel, TOTAL_LEVELS } from "./levels";
 import { sfx } from "./audio";
+import { addCoins, hasPower, loadShop, outfitColors, type ShopState } from "./shop";
 
 const TILE = 64;
 const WORLD_H = 720;
@@ -16,11 +17,13 @@ export class GameScene extends Phaser.Scene {
   private monsters!: Phaser.Physics.Arcade.Group;
   private lurkers!: Phaser.Physics.Arcade.Group;
   private flyers!: Phaser.Physics.Arcade.Group;
+  private coins!: Phaser.Physics.Arcade.StaticGroup;
 
   private solids!: Phaser.Physics.Arcade.StaticGroup;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private score = 0;
   private lives = 3;
+  private maxLives = 3;
   private levelIndex = 0;
   private crystalsFound = 0;
   private totalCrystals = 5;
@@ -29,6 +32,17 @@ export class GameScene extends Phaser.Scene {
   private finished = false;
   private wasOnGround = true;
 
+  // Shop-driven perks
+  private shop: ShopState = { coins: 0, owned: ["default"], outfit: "default" };
+  private runSpeed = 230;
+  private maxJumps = 1;
+  private jumpsLeft = 1;
+  private jumpWasDown = false;
+  private magnet = false;
+  private shielded = false;
+  private shieldRing?: Phaser.GameObjects.Arc;
+  private wallet = 0;
+
   constructor() {
     super("game");
   }
@@ -36,11 +50,18 @@ export class GameScene extends Phaser.Scene {
   init(data: SceneInit) {
     this.levelIndex = data.level ?? 0;
     this.score = data.score ?? 0;
-    this.lives = data.lives ?? 3;
+    this.shop = loadShop();
+    this.wallet = this.shop.coins;
+    this.maxLives = 3 + (hasPower(this.shop, "extra-heart") ? 1 : 0);
+    this.lives = data.lives ?? this.maxLives;
+    this.runSpeed = hasPower(this.shop, "swift-boots") ? 300 : 230;
+    this.maxJumps = hasPower(this.shop, "double-jump") ? 2 : 1;
+    this.magnet = hasPower(this.shop, "magnet");
+    this.shielded = hasPower(this.shop, "shield");
   }
 
   preload() {
-    buildTextures(this);
+    buildTextures(this, outfitColors(this.shop.outfit));
   }
 
   create() {
@@ -50,7 +71,9 @@ export class GameScene extends Phaser.Scene {
     this.totalCrystals = layout.crystals.length;
     this.finished = false;
     this.invulnerableUntil = 0;
+    this.jumpsLeft = this.maxJumps;
     this.worldWidth = cfg.tiles * TILE;
+
 
     this.physics.world.setBounds(0, 0, this.worldWidth, WORLD_H);
     this.cameras.main.setBounds(0, 0, this.worldWidth, WORLD_H);
