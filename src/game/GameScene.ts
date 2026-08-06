@@ -38,6 +38,9 @@ export class GameScene extends Phaser.Scene {
   private moon: Phaser.GameObjects.Arc | undefined;
   private hillFar: Phaser.GameObjects.TileSprite | undefined;
   private hillNear: Phaser.GameObjects.TileSprite | undefined;
+  /** Cached backdrop pixel size so we only resize layers when the view changes. */
+  private backdropSize: { w: number; h: number } | null = null;
+
 
 
   // Shop-driven perks
@@ -269,15 +272,20 @@ export class GameScene extends Phaser.Scene {
     // increases its zoom just enough to keep the backdrop and map edge-to-edge.
     const byHeight = height / TARGET_VIEW_HEIGHT;
     const byWidth = width / MAX_VIEW_WIDTH;
-    const zoom = Math.max(0.5, byHeight, byWidth);
+    let zoom = Math.max(0.5, byHeight, byWidth);
+    // Never ask the camera for more world than the level actually has.
+    const minZoomForWorld = Math.max(width / this.worldWidth, height / WORLD_H);
+    zoom = Math.max(zoom, minZoomForWorld);
 
     const camera = this.cameras.main;
     camera.setViewport(0, 0, width, height);
     camera.setZoom(zoom);
     camera.setBounds(0, 0, this.worldWidth, WORLD_H);
     camera.centerOn(this.player?.x ?? SPAWN.x, this.player?.y ?? SPAWN.y);
+    this.backdropSize = null;
     this.layoutBackdrop();
   }
+
 
   private buildBackground(palette: ReturnType<typeof getLevel>["palette"]) {
     const skyKey = `sky-${this.levelIndex}`;
@@ -335,33 +343,46 @@ export class GameScene extends Phaser.Scene {
     this.layoutBackdrop();
   }
 
-  /** Keeps every backdrop layer glued to (and covering) the camera viewport. */
+  /**
+   * Keeps every backdrop layer glued to (and covering) the camera viewport.
+   * Positions update every frame (cheap); sizes only when the view changes.
+   */
   private layoutBackdrop() {
     const cam = this.cameras.main;
     const view = cam.worldView;
     if (!view.width || !this.sky) return;
-    // A small world-space bleed hides fractional-pixel seams at every zoom.
-    const bleed = 4;
+    // A generous world-space bleed hides fractional-pixel seams at every zoom.
+    const bleed = 8;
     const w = Math.ceil(view.width) + bleed * 2;
     const h = Math.ceil(view.height) + bleed * 2;
     const x = Math.floor(view.x) - bleed;
     const y = Math.floor(view.y) - bleed;
 
-    this.sky.setPosition(x, y).setDisplaySize(w, h);
-    this.stars?.setPosition(x, y).setSize(w, Math.min(h, 420));
-    if (this.stars) this.stars.tilePositionX = cam.scrollX * 0.1;
-    this.moon?.setPosition(x + w * 0.78, y + h * 0.22);
+    if (!this.backdropSize || this.backdropSize.w !== w || this.backdropSize.h !== h) {
+      this.backdropSize = { w, h };
+      this.sky.setDisplaySize(w, h);
+      this.stars?.setSize(w, Math.min(h, 420));
+      this.hillFar?.setSize(w, 210);
+      this.hillNear?.setSize(w, 320);
+    }
 
+    this.sky.setPosition(x, y);
+    this.moon?.setPosition(x + w * 0.78, y + h * 0.22);
+    if (this.stars) {
+      this.stars.setPosition(x, y);
+      this.stars.tilePositionX = cam.scrollX * 0.1;
+    }
     // Hills keep their world-space footing (based at the ground line) while
     // following the camera horizontally with parallax tile offsets.
     if (this.hillFar) {
-      this.hillFar.setPosition(x, GROUND_Y + 40).setSize(w, 210);
+      this.hillFar.setPosition(x, GROUND_Y + 40);
       this.hillFar.tilePositionX = cam.scrollX * 0.75 + x * 0.25;
     }
     if (this.hillNear) {
-      this.hillNear.setPosition(x, GROUND_Y + 60).setSize(w, 320);
+      this.hillNear.setPosition(x, GROUND_Y + 60);
       this.hillNear.tilePositionX = cam.scrollX * 0.5 + x * 0.5;
     }
+
 
   }
 
@@ -377,7 +398,7 @@ export class GameScene extends Phaser.Scene {
           { key: "parth-run-c" },
           { key: "parth-run-d" },
         ],
-        frameRate: 12,
+        frameRate: 10,
         repeat: -1,
       });
 
@@ -604,23 +625,21 @@ export class GameScene extends Phaser.Scene {
     if (!onGround) {
       this.player.setTexture("parth-jump");
       this.player.anims.stop();
-      // Lean into the arc: nose up on the way up, down on the way down.
-      this.player.setAngle(Phaser.Math.Clamp(body.velocity.y * 0.02, -8, 8) * (this.player.flipX ? -1 : 1));
+      // Very small lean into the arc — no per-frame scaling.
+      this.player.setAngle(Phaser.Math.Clamp(body.velocity.y * 0.008, -3, 3) * (this.player.flipX ? -1 : 1));
     } else if (left || right) {
-      if (this.player.anims.currentAnim?.key !== "parth-run") {
+      if (!this.player.anims.isPlaying || this.player.anims.currentAnim?.key !== "parth-run") {
         this.player.anims.play("parth-run", true);
       }
-      // Subtle stride bob only — the leg frames carry the run now.
-      this.player.setAngle(Math.sin(this.time.now / 90) * 1.5);
-      this.player.setScale(1, 1 + Math.sin(this.time.now / 90) * 0.02);
-
-    } else {
+      if (this.player.angle !== 0) this.player.setAngle(0);
+      // The leg frames carry the run; no tilt or bob writes each frame.
+    } else if (this.player.texture.key !== "parth-idle") {
       this.player.anims.stop();
       this.player.setTexture("parth-idle");
       this.player.setAngle(0);
-      // Idle breathing.
-      this.player.setScale(1, 1 + Math.sin(this.time.now / 320) * 0.03);
     }
+
+
 
 
     if (this.player.x < 8) this.player.setX(8);
