@@ -181,6 +181,7 @@ export class Backdrop {
       draw(g, rng(seed));
       g.generateTexture(key, TW, h);
       g.destroy();
+      this.scene.textures.get(key).setFilter(Phaser.Textures.FilterMode.NEAREST);
     }
     return key;
   }
@@ -556,13 +557,12 @@ export class Backdrop {
       .tileSprite(0, 0, TW, 260, this.ridgeKey())
       .setOrigin(0, 1)
       .setDepth(1)
-      .setAlpha(0.5);
+      .setAlpha(0.9);
 
     this.treesFar = s.add
-      .tileSprite(0, 0, TW, 260, this.treeBand("treesFar", 260, b.far, 6, 0.9))
+      .tileSprite(0, 0, TW, 260, this.treeBand("treesFar", 260, shade(b.far, -0.12), 6, 0.9))
       .setOrigin(0, 1)
-      .setDepth(1)
-      .setAlpha(0.62);
+      .setDepth(1);
 
     this.treesMid = s.add
       .tileSprite(0, 0, TW, 300, this.treeBand("treesMid", 300, shade(b.mid, 0.08), 5, 1.05))
@@ -578,7 +578,7 @@ export class Backdrop {
       .tileSprite(0, 0, TW, 160, this.mistKey())
       .setOrigin(0, 1)
       .setDepth(2)
-      .setAlpha(0);
+      .setAlpha(0.18);
 
     this.foliage = s.add
       .tileSprite(0, 0, TW, 170, this.foliageKey())
