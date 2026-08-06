@@ -282,7 +282,12 @@ export function GameShell() {
           </>
         )}
 
-        <div className="pointer-events-auto absolute right-3 top-3 z-40 flex gap-2">
+        <div
+          className={`pointer-events-auto absolute right-3 top-3 z-40 flex gap-2 ${
+            status === "settings" ? "hidden" : ""
+          }`}
+        >
+
           {status !== "start" && (
             <button
               type="button"
