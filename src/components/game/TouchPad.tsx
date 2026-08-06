@@ -1,6 +1,6 @@
 import { ArrowLeft, ArrowRight, ArrowUp, Move } from "lucide-react";
 import { controls } from "@/game/state";
-import type { ControlsLayout, PadKey } from "@/game/settings";
+import { padOpacity, padScale, type ControlsLayout, type PadKey } from "@/game/settings";
 
 type Props = {
   layout: ControlsLayout;
@@ -26,7 +26,7 @@ const KEYS: PadKey[] = ["left", "right", "jump"];
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
 
 export function TouchPad({ layout, editing = false, onMove }: Props) {
-  const size = (key: PadKey) => Math.round((key === "jump" ? 80 : 72) * layout.scale);
+  const size = (key: PadKey) => Math.round((key === "jump" ? 80 : 72) * padScale(layout, key));
 
   const startDrag = (key: PadKey) => (e: React.PointerEvent<HTMLButtonElement>) => {
     if (!editing || !onMove) return;
@@ -85,7 +85,7 @@ export function TouchPad({ layout, editing = false, onMove }: Props) {
               top: `${pos.y * 100}%`,
               width: px,
               height: px,
-              opacity: layout.opacity,
+              opacity: padOpacity(layout, key),
               transform: "translate(-50%, -50%)",
             }}
             className={`pointer-events-auto absolute flex touch-none select-none items-center justify-center rounded-2xl border backdrop-blur transition active:scale-95 ${
