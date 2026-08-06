@@ -6,6 +6,7 @@ export type GameStatus =
   | "start"
   | "levelselect"
   | "shop"
+  | "settings"
   | "playing"
   | "paused"
   | "levelclear"
