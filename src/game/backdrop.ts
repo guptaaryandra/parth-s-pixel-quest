@@ -40,6 +40,8 @@ export type Biome = {
   accent: number;
   accent2: number;
   mist: number;
+  /** Tint applied to ground/platform tiles so terrain matches the map design. */
+  terrainTint: number;
 };
 
 type Row = [
@@ -93,6 +95,7 @@ export const BIOMES: Biome[] = ROWS.map((r) => ({
   accent: r[11],
   accent2: r[12],
   mist: r[13],
+  terrainTint: r[9],
 }));
 
 /**
