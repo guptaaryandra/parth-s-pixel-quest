@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { biomeFor, type Biome } from "@/game/backdrop";
+import { biomeFor, type Biome } from "@/game/biomes";
 
 const hex = (n: number) => `#${n.toString(16).padStart(6, "0")}`;
 
