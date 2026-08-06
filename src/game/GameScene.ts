@@ -38,6 +38,9 @@ export class GameScene extends Phaser.Scene {
   private moon: Phaser.GameObjects.Arc | undefined;
   private hillFar: Phaser.GameObjects.TileSprite | undefined;
   private hillNear: Phaser.GameObjects.TileSprite | undefined;
+  /** Cached backdrop pixel size so we only resize layers when the view changes. */
+  private backdropSize: { w: number; h: number } | null = null;
+
 
 
   // Shop-driven perks
