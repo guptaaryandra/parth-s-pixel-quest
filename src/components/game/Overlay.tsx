@@ -34,7 +34,7 @@ const panel =
 
 /** Home screen keeps the biome backdrop visible behind a soft vignette. */
 const homePanel =
-  "absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-gradient-to-t from-overlay/80 via-overlay/35 to-overlay/25 px-6 text-center animate-fade-in";
+  "absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-linear-to-t from-overlay/80 via-overlay/30 to-overlay/20 px-6 text-center animate-fade-in";
 
 const cta =
   "inline-flex touch-manipulation select-none items-center gap-2 rounded-2xl bg-gradient-hero px-7 py-3 font-pixel text-xs text-primary-foreground shadow-glow transition hover:brightness-110 active:scale-95";
