@@ -103,16 +103,16 @@ export const BIOMES: Biome[] = ROWS.map((r) => ({
  * levels 1-10 use them in order, 11-20 repeat the same ten, and so on.
  */
 export const MAP_CYCLE: Feature[] = [
-  "oak",
-  "jungle",
-  "blossom",
-  "crystal",
-  "frozen",
-  "waterfall",
-  "mushroom",
-  "temple",
-  "bamboo",
-  "volcano",
+  "oak", // 1 Twilight Valley
+  "jungle", // 2 Lantern Woods
+  "blossom", // 3 Sakura Ridge
+  "temple", // 4 Storm Bastion
+  "volcano", // 5 Ember Summit
+  "frozen", // 6 Frost Hollow
+  "crystal", // 7 Neon Bazaar
+  "waterfall", // 8 Thunder Spires
+  "mushroom", // 9 Void Garden
+  "bamboo", // 10 Celestial Crown
 ];
 
 const BY_KEY = new Map<Feature, Biome>(BIOMES.map((b) => [b.key, b]));
