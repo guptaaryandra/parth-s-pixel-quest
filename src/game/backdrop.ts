@@ -40,6 +40,8 @@ export type Biome = {
   accent: number;
   accent2: number;
   mist: number;
+  /** Tint applied to ground/platform tiles so terrain matches the map design. */
+  terrainTint: number;
 };
 
 type Row = [
@@ -93,11 +95,32 @@ export const BIOMES: Biome[] = ROWS.map((r) => ({
   accent: r[11],
   accent2: r[12],
   mist: r[13],
+  terrainTint: r[9],
 }));
 
-/** Stable, spread-out biome for a level index (0-based). */
+/**
+ * Ten distinct map designs, cycled every ten levels:
+ * levels 1-10 use them in order, 11-20 repeat the same ten, and so on.
+ */
+export const MAP_CYCLE: Feature[] = [
+  "oak", // 1 Twilight Valley
+  "jungle", // 2 Lantern Woods
+  "blossom", // 3 Sakura Ridge
+  "temple", // 4 Storm Bastion
+  "volcano", // 5 Ember Summit
+  "frozen", // 6 Frost Hollow
+  "crystal", // 7 Neon Bazaar
+  "waterfall", // 8 Thunder Spires
+  "mushroom", // 9 Void Garden
+  "bamboo", // 10 Celestial Crown
+];
+
+const BY_KEY = new Map<Feature, Biome>(BIOMES.map((b) => [b.key, b]));
+
+/** Map design for a level index (0-based); repeats every 10 levels. */
 export function biomeFor(levelIndex: number): Biome {
-  return BIOMES[levelIndex % BIOMES.length]!;
+  const key = MAP_CYCLE[((levelIndex % MAP_CYCLE.length) + MAP_CYCLE.length) % MAP_CYCLE.length]!;
+  return BY_KEY.get(key) ?? BIOMES[0]!;
 }
 
 function rng(seed: number) {
