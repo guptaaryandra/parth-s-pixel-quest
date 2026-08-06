@@ -436,8 +436,9 @@ export class Backdrop {
             // mossy boulders
             g.fillStyle(b.trunk, 1);
             blob(g, cx, 168, 26);
-            g.fillStyle(b.nearLight, 1);
-            g.fillRect(cx - 24, 146, 48, 7);
+            // moss cap hugging the boulder crown
+            g.fillStyle(shade(b.near, -0.15), 1);
+            blob(g, cx - 4, 152, 18);
           } else if (kind === 1) {
             // ruin arch / wooden bridge
             g.fillStyle(b.mid, 1);
