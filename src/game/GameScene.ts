@@ -344,7 +344,21 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  /** Quick squash-and-stretch pop on Parth for jumps and landings. */
+  private stretch(sx: number, sy: number) {
+    this.tweens.killTweensOf(this.player);
+    this.player.setScale(sx, sy);
+    this.tweens.add({
+      targets: this.player,
+      scaleX: 1,
+      scaleY: 1,
+      duration: 160,
+      ease: "Quad.easeOut",
+    });
+  }
+
   private pop(x: number, y: number, color: number) {
+
     for (let i = 0; i < 8; i++) {
       const bit = this.add.rectangle(x, y, 5, 5, color).setDepth(6);
       this.tweens.add({
