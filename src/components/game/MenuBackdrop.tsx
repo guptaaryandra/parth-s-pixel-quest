@@ -45,12 +45,12 @@ export function MenuBackdrop({ levelIndex = 0 }: { levelIndex?: number }) {
       {/* Far ridge */}
       <div
         className="absolute inset-x-[-25%] bottom-0 h-[55%] animate-drift-slow"
-        style={blobs(hex(b.far), 320, 150, 0.9)}
+        style={{ ...blobs(hex(b.far), 320, 150, 0.9), filter: "brightness(1.35)" }}
       />
       {/* Mid canopy */}
       <div
         className="absolute inset-x-[-25%] bottom-0 h-[45%] animate-drift-mid"
-        style={blobs(hex(b.mid), 160, 120, 0.95)}
+        style={{ ...blobs(hex(b.mid), 160, 120, 0.95), filter: "brightness(1.15)" }}
       />
       {/* Near trees */}
       <div
@@ -69,7 +69,16 @@ export function MenuBackdrop({ levelIndex = 0 }: { levelIndex?: number }) {
         }}
       />
       {/* Readability overlay */}
-      <div className="absolute inset-0 bg-overlay/25" />
+      <div
+        className="absolute inset-x-[-25%] bottom-[8%] h-[30%] animate-drift-mid"
+        style={{
+          backgroundImage: `radial-gradient(2px 2px at 25% 40%, ${hex(b.accent)} 99%, transparent), radial-gradient(2px 2px at 65% 70%, ${hex(b.accent2)} 99%, transparent)`,
+          backgroundSize: "160px 100%",
+          opacity: 0.55,
+        }}
+      />
+      {/* Readability overlay */}
+      <div className="absolute inset-0 bg-overlay/20" />
     </div>
   );
 }

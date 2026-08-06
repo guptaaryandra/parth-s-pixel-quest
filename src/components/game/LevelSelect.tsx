@@ -11,7 +11,7 @@ type Props = {
 export function LevelSelect({ unlocked, best, onSelect, onBack }: Props) {
   return (
     <div className="absolute inset-0 z-30 flex flex-col gap-2 bg-overlay/90 px-3 py-2.5 backdrop-blur-sm animate-fade-in sm:px-6 sm:py-3">
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center gap-2 pr-40">
         <button
           type="button"
           onPointerUp={onBack}
@@ -19,10 +19,12 @@ export function LevelSelect({ unlocked, best, onSelect, onBack }: Props) {
         >
           <ArrowLeft size={12} /> Back
         </button>
-        <h2 className="truncate font-pixel text-[10px] text-crystal sm:text-xs">Select Level</h2>
         <span className="shrink-0 font-pixel text-[9px] text-muted-foreground tabular-nums">
           {Math.min(unlocked + 1, LEVELS.length)}/{LEVELS.length}
         </span>
+        <h2 className="mr-auto truncate font-pixel text-[10px] text-crystal sm:text-xs">
+          Select Level
+        </h2>
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">

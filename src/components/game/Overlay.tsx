@@ -32,6 +32,10 @@ type Props = {
 const panel =
   "absolute inset-0 z-30 flex flex-col items-center justify-center gap-5 bg-overlay/85 px-6 text-center backdrop-blur-sm animate-fade-in";
 
+/** Home screen keeps the biome backdrop visible behind a soft vignette. */
+const homePanel =
+  "absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-gradient-to-t from-overlay/85 via-overlay/40 to-overlay/30 px-6 text-center animate-fade-in";
+
 const cta =
   "inline-flex touch-manipulation select-none items-center gap-2 rounded-2xl bg-gradient-hero px-7 py-3 font-pixel text-xs text-primary-foreground shadow-glow transition hover:brightness-110 active:scale-95";
 
@@ -60,7 +64,7 @@ export function Overlay({
 
   if (status === "start") {
     return (
-      <div className={panel}>
+      <div className={homePanel}>
         <span className="font-pixel text-[10px] uppercase tracking-[0.35em] text-crystal">
           A pixel adventure
         </span>
