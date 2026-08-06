@@ -506,10 +506,10 @@ export class Backdrop {
 
   private mistKey() {
     return this.tex("mist", 160, (g, rnd) => {
-      for (let i = 0; i < 16; i++) {
-        g.fillStyle(this.biome.mist, 0.035 + rnd() * 0.035);
-        const y = 30 + rnd() * 100;
-        const r = 26 + rnd() * 22;
+      for (let i = 0; i < 7; i++) {
+        g.fillStyle(this.biome.mist, 0.02 + rnd() * 0.02);
+        const y = 60 + rnd() * 80;
+        const r = 34 + rnd() * 26;
         const cx = rnd() * TW;
         tiled(cx, (px) => {
           for (let k = -3; k <= 3; k++) blob(g, px + k * r * 0.85, y + Math.abs(k) * 4, r * (1 - Math.abs(k) * 0.15));
@@ -578,7 +578,7 @@ export class Backdrop {
       .tileSprite(0, 0, TW, 160, this.mistKey())
       .setOrigin(0, 1)
       .setDepth(2)
-      .setAlpha(0.7);
+      .setAlpha(0.45);
 
     this.foliage = s.add
       .tileSprite(0, 0, TW, 170, this.foliageKey())
