@@ -43,7 +43,7 @@ export function Shop({ state, onBuy, onEquip, onBack }: Props) {
           {OUTFITS.map((o) => {
             const owned = state.owned.includes(o.id);
             const equipped = state.outfit === o.id;
-            const swatch = [o.colors.c ?? "#2fb6a8", o.colors.r ?? "#ef5f78", o.colors.p ?? "#33406b"];
+            const swatch = [o.colors["c"] ?? "#2fb6a8", o.colors["r"] ?? "#ef5f78", o.colors["p"] ?? "#33406b"];
             return (
               <div key={o.id} className={card}>
                 <div className="flex items-center gap-2">
