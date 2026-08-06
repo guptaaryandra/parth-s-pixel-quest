@@ -23,6 +23,8 @@ export type StatePatch = {
   totalLevels: number;
   /** Coins banked in the shop wallet. */
   wallet: number;
+  /** Coins collected in the current run (resets when Parth dies). */
+  runCoins: number;
   shielded: boolean;
   status?: "levelclear" | "gameover" | "victory";
 };

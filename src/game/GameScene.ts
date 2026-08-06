@@ -42,6 +42,8 @@ export class GameScene extends Phaser.Scene {
   private shielded = false;
   private shieldRing: Phaser.GameObjects.Arc | undefined;
   private wallet = 0;
+  /** Coins picked up during this run — shown in the HUD, resets on death. */
+  private runCoins = 0;
 
   constructor() {
     super("game");
@@ -52,6 +54,7 @@ export class GameScene extends Phaser.Scene {
     this.score = data.score ?? 0;
     this.shop = loadShop();
     this.wallet = this.shop.coins;
+    this.runCoins = 0;
     this.maxLives = 3 + (hasPower(this.shop, "extra-heart") ? 1 : 0);
     this.lives = data.lives ?? this.maxLives;
     this.runSpeed = hasPower(this.shop, "swift-boots") ? 300 : 230;
@@ -210,6 +213,7 @@ export class GameScene extends Phaser.Scene {
       coin.disableBody(true, true);
       this.score += 10;
       this.wallet = addCoins(1).coins;
+      this.runCoins += 1;
       sfx.coin();
       this.emitState();
       this.pop(coin.x, coin.y, 0xffc94a);
@@ -425,6 +429,7 @@ export class GameScene extends Phaser.Scene {
       level: this.levelIndex + 1,
       totalLevels: TOTAL_LEVELS,
       wallet: this.wallet,
+      runCoins: this.runCoins,
       shielded: this.shielded,
       status,
     });
