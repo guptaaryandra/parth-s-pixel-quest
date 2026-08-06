@@ -305,6 +305,10 @@ export function GameShell() {
           />
         )}
 
+        {status === "shop" && (
+          <Shop state={shop} onBuy={purchase} onEquip={equip} onBack={goHome} />
+        )}
+
         {portrait && (
           <div className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-background/95 p-6 text-center">
             <RotateCw className="size-10 animate-pulse text-crystal" />
@@ -325,12 +329,15 @@ export function GameShell() {
           levelName={level.name}
           levelTagline={level.tagline}
           nextLevelName={getLevel(levelIndex + 1).name}
+          wallet={shop.coins}
           onPlay={openLevelSelect}
+          onShop={openShop}
           onResume={togglePause}
           onNextLevel={nextLevel}
           onRetryLevel={retryLevel}
           onGoHome={goHome}
         />
+
       </div>
     </div>
   );
