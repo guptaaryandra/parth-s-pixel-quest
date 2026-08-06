@@ -327,13 +327,15 @@ export class GameScene extends Phaser.Scene {
     // Parallax hill bands: seamless tiling textures whose scroll is driven from
     // the camera, so they extend forever instead of running out of world.
     this.hillFar = this.add
-      .tileSprite(0, 0, 512, 300, hillKey("hill-far", palette.hillFar, 300, 340))
+      .tileSprite(0, 0, 512, 210, hillKey("hill-far", palette.hillFar, 210, 300))
       .setOrigin(0, 1)
+      .setAlpha(0.7)
       .setDepth(2);
     this.hillNear = this.add
-      .tileSprite(0, 0, 512, 230, hillKey("hill-near", palette.hillNear, 230, 260))
+      .tileSprite(0, 0, 512, 320, hillKey("hill-near", palette.hillNear, 320, 240))
       .setOrigin(0, 1)
       .setDepth(2);
+
 
     this.layoutBackdrop();
   }
