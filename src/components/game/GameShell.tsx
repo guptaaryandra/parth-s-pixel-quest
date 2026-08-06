@@ -221,11 +221,14 @@ export function GameShell() {
             <Hud
               score={score}
               lives={lives}
+              maxLives={maxLives}
               crystals={crystals}
               totalCrystals={totalCrystals}
               level={levelIndex + 1}
               totalLevels={TOTAL_LEVELS}
               levelName={level.name}
+              wallet={shop.coins}
+              shielded={shielded}
             />
             <TouchPad />
           </>
@@ -252,6 +255,17 @@ export function GameShell() {
               <LayoutGrid size={18} />
             </button>
           )}
+          {status !== "shop" && !running && (
+            <button
+              type="button"
+              onPointerUp={openShop}
+              aria-label="Open shop"
+              className="touch-manipulation rounded-xl border border-border bg-panel/80 p-2 text-foreground backdrop-blur transition hover:bg-accent"
+            >
+              <ShoppingBag size={18} />
+            </button>
+          )}
+
           <button
             type="button"
             onPointerUp={toggleMute}
