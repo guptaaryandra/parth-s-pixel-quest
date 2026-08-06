@@ -544,7 +544,7 @@ export class Backdrop {
       .tileSprite(0, 0, TW, 200, this.cloudsKey())
       .setOrigin(0, 0)
       .setDepth(-1)
-      .setAlpha(0.6);
+      .setAlpha(0);
 
     // Moon sits in front of the cloud band so it stays clean and bright.
     this.moonGlow = s.add.circle(0, 0, 96, b.moon, 0.14).setDepth(-0.5);
