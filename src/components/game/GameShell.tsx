@@ -368,16 +368,13 @@ export function GameShell() {
           <Shop state={shop} onBuy={purchase} onEquip={equip} onBack={goHome} />
         )}
 
-        {portrait && (
-          <div className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-background/95 p-6 text-center">
-            <RotateCw className="size-10 animate-pulse text-crystal" />
-            <p className="font-pixel text-[10px] leading-relaxed text-foreground sm:text-xs">
-              Rotate your device
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Parth&apos;s Anime Quest plays in horizontal (16:9) mode only.
-            </p>
-          </div>
+        {status === "settings" && (
+          <Settings
+            layout={layout}
+            onChange={updateLayout}
+            onReset={resetControls}
+            onBack={goHome}
+          />
         )}
 
         <Overlay
@@ -398,6 +395,8 @@ export function GameShell() {
         />
 
       </div>
+      </div>
     </div>
   );
 }
+
