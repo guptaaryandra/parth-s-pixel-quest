@@ -292,8 +292,8 @@ export class Backdrop {
           const w = (86 - t * 58) * s;
           const y = top - 40 * s + i * 26 * s;
           g.fillRect(x - w / 2, y, w, 24 * s);
-          g.fillStyle(shade(color, 0.22), 1);
-          g.fillRect(x - w / 2, y, w * 0.55, 4 * s);
+          g.fillStyle(shade(color, 0.14), 1);
+          g.fillRect(x - w / 2, y, w * 0.45, 3 * s);
           g.fillStyle(color, 1);
         }
         break;
@@ -406,13 +406,12 @@ export class Backdrop {
         blob(g, x - 40 * s, top - 6 * s, 28 * s);
         blob(g, x + 40 * s, top - 10 * s, 30 * s);
         blob(g, x - 12 * s, top - 52 * s, 26 * s);
-        // moonlit rim so canopies read as separate shapes, not one dark mass
-        g.fillStyle(shade(color, 0.26), 1);
-        g.fillRect(x - 34 * s, top - 66 * s, 46 * s, 7 * s);
-        g.fillRect(x + 16 * s, top - 34 * s, 34 * s, 6 * s);
-        g.fillRect(x - 58 * s, top - 26 * s, 26 * s, 6 * s);
-        g.fillStyle(shade(color, -0.3), 1);
-        g.fillRect(x - 22 * s, top - 2 * s, 60 * s, 6 * s);
+        // moonlit rim: lighter crowns tucked inside the canopy silhouette
+        g.fillStyle(shade(color, 0.16), 1);
+        blob(g, x - 6 * s, top - 34 * s, 26 * s);
+        blob(g, x + 34 * s, top - 16 * s, 16 * s);
+        g.fillStyle(shade(color, -0.28), 1);
+        blob(g, x - 34 * s, top + 2 * s, 16 * s);
         g.fillStyle(color, 1);
         // vines
         g.fillStyle(color, 0.9);
