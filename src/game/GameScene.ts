@@ -93,6 +93,9 @@ export class GameScene extends Phaser.Scene {
 
     this.solids = this.physics.add.staticGroup();
 
+    // Terrain picks up the map's palette so each of the 10 designs reads distinctly.
+    const terrain = biomeFor(this.levelIndex).terrainTint;
+
     for (const [start, end] of layout.ground) {
       const width = (end - start) * TILE;
       if (width <= 0) continue;
@@ -102,11 +105,16 @@ export class GameScene extends Phaser.Scene {
       const body = this.add.rectangle(start * TILE + width / 2, GROUND_Y + 16, width, 32);
       this.solids.add(body);
       tile.setDepth(3);
+      tile.setTint(terrain);
     }
 
     for (const [tx, y, tiles] of layout.platforms) {
       const width = tiles * TILE;
-      this.add.tileSprite(tx * TILE, y, width, 24, "platform").setOrigin(0, 0).setDepth(3);
+      this.add
+        .tileSprite(tx * TILE, y, width, 24, "platform")
+        .setOrigin(0, 0)
+        .setDepth(3)
+        .setTint(terrain);
       const body = this.add.rectangle(tx * TILE + width / 2, y + 8, width, 16);
       this.solids.add(body);
     }

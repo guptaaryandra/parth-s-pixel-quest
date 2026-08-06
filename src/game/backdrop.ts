@@ -95,9 +95,29 @@ export const BIOMES: Biome[] = ROWS.map((r) => ({
   mist: r[13],
 }));
 
-/** Stable, spread-out biome for a level index (0-based). */
+/**
+ * Ten distinct map designs, cycled every ten levels:
+ * levels 1-10 use them in order, 11-20 repeat the same ten, and so on.
+ */
+export const MAP_CYCLE: Feature[] = [
+  "oak",
+  "jungle",
+  "blossom",
+  "crystal",
+  "frozen",
+  "waterfall",
+  "mushroom",
+  "temple",
+  "bamboo",
+  "volcano",
+];
+
+const BY_KEY = new Map<Feature, Biome>(BIOMES.map((b) => [b.key, b]));
+
+/** Map design for a level index (0-based); repeats every 10 levels. */
 export function biomeFor(levelIndex: number): Biome {
-  return BIOMES[levelIndex % BIOMES.length]!;
+  const key = MAP_CYCLE[((levelIndex % MAP_CYCLE.length) + MAP_CYCLE.length) % MAP_CYCLE.length]!;
+  return BY_KEY.get(key) ?? BIOMES[0]!;
 }
 
 function rng(seed: number) {
