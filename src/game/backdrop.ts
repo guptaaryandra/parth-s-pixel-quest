@@ -114,6 +114,18 @@ const TW = 512;
 
 type G = Phaser.GameObjects.Graphics;
 
+/** Blend a colour toward white (moonlight rim) or black (depth). */
+function shade(color: number, amt: number) {
+  const c = Phaser.Display.Color.IntegerToColor(color);
+  const t = amt >= 0 ? 255 : 0;
+  const k = Math.abs(amt);
+  return Phaser.Display.Color.GetColor(
+    Math.round(c.red + (t - c.red) * k),
+    Math.round(c.green + (t - c.green) * k),
+    Math.round(c.blue + (t - c.blue) * k),
+  );
+}
+
 /** Chunky pixel blob — a few overlapping rects, keeps the pixel-art feel. */
 function blob(g: G, x: number, y: number, r: number) {
   g.fillRect(x - r, y - r * 0.6, r * 2, r * 1.2);
@@ -280,6 +292,9 @@ export class Backdrop {
           const w = (86 - t * 58) * s;
           const y = top - 40 * s + i * 26 * s;
           g.fillRect(x - w / 2, y, w, 24 * s);
+          g.fillStyle(shade(color, 0.22), 1);
+          g.fillRect(x - w / 2, y, w * 0.55, 4 * s);
+          g.fillStyle(color, 1);
         }
         break;
       }
@@ -387,10 +402,18 @@ export class Backdrop {
         g.fillRect(x, top + 34 * s, 30 * s, 6 * s);
         // canopy: overlapping chunky blobs
         g.fillStyle(color, 1);
-        blob(g, x, top - 26 * s, 46 * s);
-        blob(g, x - 42 * s, top - 6 * s, 30 * s);
-        blob(g, x + 42 * s, top - 10 * s, 32 * s);
-        blob(g, x - 14 * s, top - 54 * s, 28 * s);
+        blob(g, x, top - 26 * s, 44 * s);
+        blob(g, x - 40 * s, top - 6 * s, 28 * s);
+        blob(g, x + 40 * s, top - 10 * s, 30 * s);
+        blob(g, x - 12 * s, top - 52 * s, 26 * s);
+        // moonlit rim so canopies read as separate shapes, not one dark mass
+        g.fillStyle(shade(color, 0.26), 1);
+        g.fillRect(x - 34 * s, top - 66 * s, 46 * s, 7 * s);
+        g.fillRect(x + 16 * s, top - 34 * s, 34 * s, 6 * s);
+        g.fillRect(x - 58 * s, top - 26 * s, 26 * s, 6 * s);
+        g.fillStyle(shade(color, -0.3), 1);
+        g.fillRect(x - 22 * s, top - 2 * s, 60 * s, 6 * s);
+        g.fillStyle(color, 1);
         // vines
         g.fillStyle(color, 0.9);
         for (let i = 0; i < 3; i++) {
@@ -514,30 +537,31 @@ export class Backdrop {
     this.stars = s.add.tileSprite(0, 0, TW, TW, this.starsKey()).setOrigin(0, 0).setDepth(0).setAlpha(0.9);
     s.tweens.add({ targets: this.stars, alpha: 0.55, duration: 2400, yoyo: true, repeat: -1 });
 
-    this.moonGlow = s.add.circle(0, 0, 92, b.moon, 0.12).setDepth(0);
-    this.moon = s.add.circle(0, 0, 52, b.moon, 0.95).setDepth(0);
-    s.tweens.add({ targets: this.moonGlow, scale: 1.15, alpha: 0.2, duration: 3200, yoyo: true, repeat: -1 });
-
     this.clouds = s.add
       .tileSprite(0, 0, TW, 200, this.cloudsKey())
       .setOrigin(0, 0)
       .setDepth(0)
-      .setAlpha(0.75);
+      .setAlpha(0.6);
+
+    // Moon sits in front of the cloud band so it stays clean and bright.
+    this.moonGlow = s.add.circle(0, 0, 96, b.moon, 0.14).setDepth(0);
+    this.moon = s.add.circle(0, 0, 50, b.moon, 1).setDepth(0);
+    s.tweens.add({ targets: this.moonGlow, scale: 1.15, alpha: 0.22, duration: 3200, yoyo: true, repeat: -1 });
 
     this.ridge = s.add
       .tileSprite(0, 0, TW, 260, this.ridgeKey())
       .setOrigin(0, 1)
       .setDepth(1)
-      .setAlpha(0.85);
+      .setAlpha(0.5);
 
     this.treesFar = s.add
       .tileSprite(0, 0, TW, 260, this.treeBand("treesFar", 260, b.far, 5, 1.1))
       .setOrigin(0, 1)
       .setDepth(1)
-      .setAlpha(0.9);
+      .setAlpha(0.62);
 
     this.treesMid = s.add
-      .tileSprite(0, 0, TW, 300, this.treeBand("treesMid", 300, b.mid, 4, 1.45))
+      .tileSprite(0, 0, TW, 300, this.treeBand("treesMid", 300, shade(b.mid, 0.08), 4, 1.35))
       .setOrigin(0, 1)
       .setDepth(2);
 
