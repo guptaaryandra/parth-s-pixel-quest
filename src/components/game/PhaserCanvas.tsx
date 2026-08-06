@@ -52,10 +52,23 @@ export function PhaserCanvas({ paused, restartKey, level, startScore, startLives
         score: boot.current.startScore,
         lives: boot.current.startLives,
       });
+
+      // The stage can be CSS-rotated, so trust the container box, not the window.
+      const fit = () => {
+        const el = holder.current;
+        if (!el) return;
+        const w = Math.round(el.offsetWidth);
+        const h = Math.round(el.offsetHeight);
+        if (w > 0 && h > 0) game.scale.resize(w, h);
+      };
+      fit();
+      observer = new ResizeObserver(fit);
+      observer.observe(holder.current);
     })();
 
     return () => {
       cancelled = true;
+      observer?.disconnect();
       gameBus.off("state", handler);
       gameRef.current?.destroy(true);
       gameRef.current = null;
