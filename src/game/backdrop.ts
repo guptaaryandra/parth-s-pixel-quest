@@ -578,7 +578,7 @@ export class Backdrop {
       .tileSprite(0, 0, TW, 160, this.mistKey())
       .setOrigin(0, 1)
       .setDepth(2)
-      .setAlpha(0.45);
+      .setAlpha(0);
 
     this.foliage = s.add
       .tileSprite(0, 0, TW, 170, this.foliageKey())
