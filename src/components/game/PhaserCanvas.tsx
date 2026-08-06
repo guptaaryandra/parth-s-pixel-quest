@@ -19,6 +19,7 @@ export function PhaserCanvas({ paused, restartKey, level, startScore, startLives
 
   useEffect(() => {
     let cancelled = false;
+    let observer: ResizeObserver | undefined;
     const handler = (patch: StatePatch) => onState(patch);
     gameBus.on("state", handler);
 
