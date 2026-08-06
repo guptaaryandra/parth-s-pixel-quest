@@ -22,7 +22,10 @@ export function MenuBackdrop({ levelIndex = 0 }: { levelIndex?: number }) {
   const b: Biome = useMemo(() => biomeFor(levelIndex), [levelIndex]);
 
   return (
-    <div className="absolute inset-0 overflow-hidden">
+    <div
+      className="absolute inset-0 overflow-hidden"
+      style={{ filter: "brightness(1.5) saturate(1.15)" }}
+    >
       {/* Sky */}
       <div
         className="absolute inset-0"
@@ -44,17 +47,17 @@ export function MenuBackdrop({ levelIndex = 0 }: { levelIndex?: number }) {
       />
       {/* Far ridge */}
       <div
-        className="absolute inset-x-[-25%] bottom-0 h-[55%] animate-drift-slow"
+        className="absolute inset-x-[-25%] bottom-0 h-[62%] animate-drift-slow"
         style={{ ...blobs(hex(b.far), 320, 150, 0.9), filter: "brightness(1.35)" }}
       />
       {/* Mid canopy */}
       <div
-        className="absolute inset-x-[-25%] bottom-0 h-[45%] animate-drift-mid"
+        className="absolute inset-x-[-25%] bottom-0 h-[50%] animate-drift-mid"
         style={{ ...blobs(hex(b.mid), 160, 120, 0.95), filter: "brightness(1.15)" }}
       />
       {/* Near trees */}
       <div
-        className="absolute inset-x-[-25%] bottom-0 h-[32%] animate-drift-fast"
+        className="absolute inset-x-[-25%] bottom-0 h-[36%] animate-drift-fast"
         style={blobs(hex(b.near), 80, 90, 1)}
       />
       {/* Glow accents + ground */}
