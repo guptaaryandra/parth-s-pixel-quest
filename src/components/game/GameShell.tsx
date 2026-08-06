@@ -5,7 +5,7 @@ import {
   Pause,
   Play,
   RotateCcw,
-  RotateCw,
+  Settings2,
   ShoppingBag,
   Volume2,
   VolumeX,
@@ -23,22 +23,35 @@ import {
   loadShop,
   type ShopState,
 } from "@/game/shop";
+import {
+  DEFAULT_LAYOUT,
+  loadLayout,
+  resetLayout,
+  saveLayout,
+  type ControlsLayout,
+} from "@/game/settings";
+import { keepLandscape, lockLandscape, requestFullscreen } from "@/game/orientation";
 import { Hud } from "./Hud";
 import { Overlay } from "./Overlay";
 import { LevelSelect } from "./LevelSelect";
+import { Settings } from "./Settings";
 import { Shop } from "./Shop";
 import { TouchPad } from "./TouchPad";
 
-function useIsPortrait() {
-  const [portrait, setPortrait] = useState(false);
+/** Tracks viewport orientation so we can rotate our own layout if the OS won't. */
+function useViewport() {
+  const [size, setSize] = useState({ w: 0, h: 0 });
   useEffect(() => {
-    const mq = window.matchMedia("(orientation: portrait)");
-    const update = () => setPortrait(mq.matches);
+    const update = () => setSize({ w: window.innerWidth, h: window.innerHeight });
     update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
+    window.addEventListener("resize", update);
+    window.addEventListener("orientationchange", update);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("orientationchange", update);
+    };
   }, []);
-  return portrait;
+  return size;
 }
 
 export function GameShell() {
@@ -55,6 +68,7 @@ export function GameShell() {
   const [best, setBest] = useState<Record<number, number>>({});
   const [shop, setShop] = useState<ShopState>({ coins: 0, owned: ["default"], outfit: "default" });
   const [shielded, setShielded] = useState(false);
+  const [layout, setLayout] = useState<ControlsLayout>(DEFAULT_LAYOUT);
   const frameRef = useRef<HTMLDivElement>(null);
   const levelRef = useRef(0);
   levelRef.current = levelIndex;
@@ -69,23 +83,23 @@ export function GameShell() {
     const startLives = 3 + (hasPower(s, "extra-heart") ? 1 : 0);
     setMaxLives(startLives);
     setLives(startLives);
+    setLayout(loadLayout());
   }, []);
 
+  /** Landscape is the only supported orientation — keep asking for it. */
+  useEffect(() => {
+    void lockLandscape();
+    return keepLandscape(() => frameRef.current);
+  }, []);
 
-  /** Full screen is the default experience — request it on the first user gesture. */
+  /** Full screen + landscape lock on the first user gesture. */
   const enterFullscreen = () => {
-    try {
-      if (!document.fullscreenElement) {
-        void frameRef.current?.requestFullscreen?.().catch(() => undefined);
-      }
-      const orientation = screen.orientation as
-        | (ScreenOrientation & { lock?: (o: string) => Promise<void> })
-        | undefined;
-      void orientation?.lock?.("landscape").catch(() => undefined);
-    } catch {
-      /* fullscreen unavailable */
-    }
+    void (async () => {
+      await requestFullscreen(frameRef.current);
+      await lockLandscape();
+    })();
   };
+
 
   const onState = useCallback((patch: StatePatch) => {
     setScore(patch.score);
