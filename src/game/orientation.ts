@@ -31,12 +31,15 @@ export async function requestFullscreen(el: HTMLElement | null) {
 export async function lockLandscape(): Promise<boolean> {
   const api = orientationApi();
   if (!api?.lock) return false;
-  try {
-    await api.lock("landscape");
-    return true;
-  } catch {
-    return false;
+  for (const target of ["landscape", "landscape-primary", "landscape-secondary"]) {
+    try {
+      await api.lock(target);
+      return true;
+    } catch {
+      /* try the next target */
+    }
   }
+  return false;
 }
 
 /** True while the viewport is taller than it is wide. */
@@ -44,6 +47,16 @@ export function isPortrait() {
   if (typeof window === "undefined") return false;
   return window.matchMedia("(orientation: portrait)").matches;
 }
+
+/**
+ * Which way to spin our own layout when the OS keeps the page portrait.
+ * Following the device angle keeps "up" where the player expects it.
+ */
+export function fallbackRotation(): 90 | -90 {
+  const angle = (typeof window !== "undefined" && screen.orientation?.angle) || 0;
+  return angle === 180 || angle === 270 ? -90 : 90;
+}
+
 
 /**
  * Keeps re-applying the landscape lock on foreground/fullscreen/orientation
@@ -62,12 +75,18 @@ export function keepLandscape(el: () => HTMLElement | null) {
   document.addEventListener("visibilitychange", onVisible);
   window.addEventListener("focus", onVisible);
   window.addEventListener("orientationchange", onVisible);
+  window.addEventListener("resize", onVisible);
+  window.addEventListener("pointerdown", onVisible);
+
   document.addEventListener("fullscreenchange", onVisible);
 
   return () => {
     document.removeEventListener("visibilitychange", onVisible);
     window.removeEventListener("focus", onVisible);
     window.removeEventListener("orientationchange", onVisible);
+    window.removeEventListener("resize", onVisible);
+    window.removeEventListener("pointerdown", onVisible);
     document.removeEventListener("fullscreenchange", onVisible);
   };
+
 }
