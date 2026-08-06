@@ -305,11 +305,13 @@ const FLYER_PALETTE: Palette = {
   p: "#1a1226",
 };
 
-export function buildTextures(scene: Phaser.Scene) {
-  drawPixelTexture(scene, "parth-idle", heroIdle, HERO_PALETTE);
-  drawPixelTexture(scene, "parth-run-a", heroRunA, HERO_PALETTE);
-  drawPixelTexture(scene, "parth-run-b", heroRunB, HERO_PALETTE);
-  drawPixelTexture(scene, "parth-jump", heroJump, HERO_PALETTE);
+export function buildTextures(scene: Phaser.Scene, heroColors: Palette = {}) {
+  const hero: Palette = { ...HERO_PALETTE, ...heroColors };
+  drawPixelTexture(scene, "parth-idle", heroIdle, hero);
+  drawPixelTexture(scene, "parth-run-a", heroRunA, hero);
+  drawPixelTexture(scene, "parth-run-b", heroRunB, hero);
+  drawPixelTexture(scene, "parth-jump", heroJump, hero);
+
   drawPixelTexture(scene, "monster-a", monsterA, MONSTER_PALETTE);
   drawPixelTexture(scene, "monster-b", monsterB, MONSTER_PALETTE);
   drawPixelTexture(scene, "lurker", lurker, LURKER_PALETTE);
