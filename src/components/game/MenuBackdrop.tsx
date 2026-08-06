@@ -50,12 +50,12 @@ export function MenuBackdrop({ levelIndex = 0 }: { levelIndex?: number }) {
       {/* Mid canopy */}
       <div
         className="absolute inset-x-[-25%] bottom-0 h-[45%] animate-drift-mid"
-        style={blobs(hex(b.mid), 190, 120, 0.95)}
+        style={blobs(hex(b.mid), 160, 120, 0.95)}
       />
       {/* Near trees */}
       <div
         className="absolute inset-x-[-25%] bottom-0 h-[32%] animate-drift-fast"
-        style={blobs(hex(b.near), 120, 90, 1)}
+        style={blobs(hex(b.near), 80, 90, 1)}
       />
       {/* Glow accents + ground */}
       <div

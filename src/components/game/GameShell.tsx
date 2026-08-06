@@ -32,6 +32,7 @@ import {
 } from "@/game/settings";
 import { fallbackRotation, keepLandscape, lockLandscape, requestFullscreen } from "@/game/orientation";
 import { Hud } from "./Hud";
+import { MenuBackdrop } from "./MenuBackdrop";
 import { Overlay } from "./Overlay";
 import { LevelSelect } from "./LevelSelect";
 import { Settings } from "./Settings";
@@ -280,7 +281,7 @@ export function GameShell() {
             onState={onState}
           />
         ) : (
-          <div className="h-full w-full bg-gradient-night" />
+          <MenuBackdrop levelIndex={unlocked} />
         )}
 
         {/* Safe-area layer: UI anchors to the usable screen edges (notches,
