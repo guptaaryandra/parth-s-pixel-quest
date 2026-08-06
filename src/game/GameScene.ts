@@ -32,14 +32,9 @@ export class GameScene extends Phaser.Scene {
   private finished = false;
   private wasOnGround = true;
 
-  // Backdrop layers — pinned to the camera viewport (see layoutBackdrop).
-  private sky: Phaser.GameObjects.Image | undefined;
-  private stars: Phaser.GameObjects.TileSprite | undefined;
-  private moon: Phaser.GameObjects.Arc | undefined;
-  private hillFar: Phaser.GameObjects.TileSprite | undefined;
-  private hillNear: Phaser.GameObjects.TileSprite | undefined;
-  /** Cached backdrop pixel size so we only resize layers when the view changes. */
-  private backdropSize: { w: number; h: number } | null = null;
+  /** Layered themed environment (sky, trees, props, foliage, ambience). */
+  private backdrop: Backdrop | undefined;
+
 
 
 
