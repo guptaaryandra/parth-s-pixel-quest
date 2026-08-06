@@ -278,7 +278,7 @@ export function GameShell() {
               wallet={shop.coins}
               shielded={shielded}
             />
-            <TouchPad />
+            <TouchPad layout={layout} />
           </>
         )}
 
