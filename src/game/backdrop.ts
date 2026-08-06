@@ -547,8 +547,9 @@ export class Backdrop {
       .setAlpha(0.6);
 
     // Moon sits in front of the cloud band so it stays clean and bright.
-    this.moonGlow = s.add.circle(0, 0, 96, b.moon, 0.14).setDepth(0);
-    this.moon = s.add.circle(0, 0, 50, b.moon, 1).setDepth(0);
+    this.moonGlow = s.add.circle(0, 0, 96, b.moon, 0.14).setDepth(-0.5);
+    this.moonGlow.setBlendMode(Phaser.BlendModes.ADD);
+    this.moon = s.add.circle(0, 0, 50, b.moon, 1).setDepth(-0.5);
     s.tweens.add({ targets: this.moonGlow, scale: 1.15, alpha: 0.22, duration: 3200, yoyo: true, repeat: -1 });
 
     this.ridge = s.add
