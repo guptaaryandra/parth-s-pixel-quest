@@ -84,6 +84,9 @@ export function keepLandscape(el: () => HTMLElement | null) {
     document.removeEventListener("visibilitychange", onVisible);
     window.removeEventListener("focus", onVisible);
     window.removeEventListener("orientationchange", onVisible);
+    window.removeEventListener("resize", onVisible);
+    window.removeEventListener("pointerdown", onVisible);
     document.removeEventListener("fullscreenchange", onVisible);
   };
+
 }
