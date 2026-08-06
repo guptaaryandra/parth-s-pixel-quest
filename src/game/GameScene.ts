@@ -398,7 +398,7 @@ export class GameScene extends Phaser.Scene {
           { key: "parth-run-c" },
           { key: "parth-run-d" },
         ],
-        frameRate: 12,
+        frameRate: 10,
         repeat: -1,
       });
 
