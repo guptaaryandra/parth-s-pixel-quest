@@ -32,6 +32,14 @@ export class GameScene extends Phaser.Scene {
   private finished = false;
   private wasOnGround = true;
 
+  // Backdrop layers — pinned to the camera viewport (see layoutBackdrop).
+  private sky: Phaser.GameObjects.Image | undefined;
+  private stars: Phaser.GameObjects.TileSprite | undefined;
+  private moon: Phaser.GameObjects.Arc | undefined;
+  private hillFar: Phaser.GameObjects.TileSprite | undefined;
+  private hillNear: Phaser.GameObjects.TileSprite | undefined;
+
+
   // Shop-driven perks
   private shop: ShopState = { coins: 0, owned: ["default"], outfit: "default" };
   private runSpeed = 230;
