@@ -613,9 +613,10 @@ export class GameScene extends Phaser.Scene {
       if (this.player.anims.currentAnim?.key !== "parth-run") {
         this.player.anims.play("parth-run", true);
       }
-      // Bouncy run: gentle body tilt plus a subtle stride bob.
-      this.player.setAngle(Math.sin(this.time.now / 70) * 3);
-      this.player.setScale(1, 1 + Math.sin(this.time.now / 70) * 0.04);
+      // Subtle stride bob only — the leg frames carry the run now.
+      this.player.setAngle(Math.sin(this.time.now / 90) * 1.5);
+      this.player.setScale(1, 1 + Math.sin(this.time.now / 90) * 0.02);
+
     } else {
       this.player.anims.stop();
       this.player.setTexture("parth-idle");
