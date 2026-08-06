@@ -233,9 +233,9 @@ export function GameShell() {
   const portrait = view.w > 0 && view.h > view.w;
   const stageW = portrait ? view.h : view.w;
   const stageH = portrait ? view.w : view.h;
-  // Fill the whole screen — no letterboxing.
-  const boxW = stageW;
-  const boxH = stageH;
+  // Keep a true 16:9 play area so nothing looks stretched.
+  const boxW = Math.min(stageW, (stageH * 16) / 9);
+  const boxH = Math.min(stageH, (stageW * 9) / 16);
 
   return (
     <div
@@ -285,7 +285,7 @@ export function GameShell() {
 
         <div
           className={`pointer-events-auto absolute right-3 top-3 z-40 flex gap-2 ${
-            status === "settings" ? "hidden" : ""
+            status === "settings" || status === "shop" ? "hidden" : ""
           }`}
         >
 

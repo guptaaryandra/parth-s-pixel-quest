@@ -36,7 +36,7 @@ export function PhaserCanvas({ paused, restartKey, level, startScore, startLives
         height: GAME_SIZE.height,
         pixelArt: true,
         scale: {
-          mode: PhaserLib.Scale.ENVELOP,
+          mode: PhaserLib.Scale.FIT,
           autoCenter: PhaserLib.Scale.CENTER_BOTH,
         },
         physics: {
@@ -67,5 +67,5 @@ export function PhaserCanvas({ paused, restartKey, level, startScore, startLives
     else scene.scene.resume();
   }, [paused]);
 
-  return <div ref={holder} className="h-full w-full [&_canvas]:!h-full [&_canvas]:!w-full" />;
+  return <div ref={holder} className="h-full w-full" />;
 }
