@@ -92,6 +92,7 @@ const heroRunA = [
   ".bbb.......bbb",
 ];
 
+/** Passing pose: legs together under the body (mid-stride). */
 const heroRunB = [
   "....hhhhhh....",
   "...hhhhhhhh...",
@@ -110,6 +111,47 @@ const heroRunB = [
   "....pp.pp.....",
   "...bbb.bbb....",
 ];
+
+/** Opposite stride: rear leg extended back, front leg tucked up. */
+const heroRunC = [
+  "....hhhhhh....",
+  "...hhhhhhhh...",
+  "..hHhhhhhhHh..",
+  "..hssssssssh..",
+  "..hsesssssesh.",
+  "...ssssssssh..",
+  "...ssssssss...",
+  "...rrrrrrrr...",
+  "...cccccccc...",
+  "...cccccccccs.",
+  ".sccccCCcccs..",
+  "...cccCCccc...",
+  "....pppppp....",
+  "...pp..ppp....",
+  "..pp....pp....",
+  ".bbb.....bbb..",
+];
+
+/** Second passing pose, knees lifted the other way. */
+const heroRunD = [
+  "....hhhhhh....",
+  "...hhhhhhhh...",
+  "..hHhhhhhhHh..",
+  "..hssssssssh..",
+  "..hsesssssesh.",
+  "...ssssssssh..",
+  "...ssssssss...",
+  "....rrrrrrr...",
+  "...cccccccc...",
+  "..scccccccc...",
+  "..scccCCcccs..",
+  "...cccCCccc...",
+  "....pppppp....",
+  "....ppppp.....",
+  "...pp..pp.....",
+  "..bbb..bbb....",
+];
+
 
 const heroJump = [
   "....hhhhhh....",
@@ -310,6 +352,9 @@ export function buildTextures(scene: Phaser.Scene, heroColors: Palette = {}) {
   drawPixelTexture(scene, "parth-idle", heroIdle, hero);
   drawPixelTexture(scene, "parth-run-a", heroRunA, hero);
   drawPixelTexture(scene, "parth-run-b", heroRunB, hero);
+  drawPixelTexture(scene, "parth-run-c", heroRunC, hero);
+  drawPixelTexture(scene, "parth-run-d", heroRunD, hero);
+
   drawPixelTexture(scene, "parth-jump", heroJump, hero);
 
   drawPixelTexture(scene, "monster-a", monsterA, MONSTER_PALETTE);

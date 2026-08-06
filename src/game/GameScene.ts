@@ -276,8 +276,10 @@ export class GameScene extends Phaser.Scene {
     let zoom = height / VIEW_H;
     if (width / zoom > MAX_VIEW_W) zoom = width / MAX_VIEW_W;
     if (width / zoom < MIN_VIEW_W) zoom = width / MIN_VIEW_W;
-    // Snap to quarter steps for stable, non-shimmering pixels.
-    zoom = Math.max(0.5, Math.round(zoom * 4) / 4);
+    // Snap to 1/8 steps: fine enough to fit any screen, coarse enough that
+    // pixel edges stay stable (no shimmering) while scrolling.
+    zoom = Math.max(0.5, Math.round(zoom * 8) / 8);
+
     this.cameras.main.setZoom(zoom);
     this.layoutBackdrop();
   }
@@ -325,13 +327,15 @@ export class GameScene extends Phaser.Scene {
     // Parallax hill bands: seamless tiling textures whose scroll is driven from
     // the camera, so they extend forever instead of running out of world.
     this.hillFar = this.add
-      .tileSprite(0, 0, 512, 300, hillKey("hill-far", palette.hillFar, 300, 340))
+      .tileSprite(0, 0, 512, 210, hillKey("hill-far", palette.hillFar, 210, 300))
       .setOrigin(0, 1)
+      .setAlpha(0.7)
       .setDepth(2);
     this.hillNear = this.add
-      .tileSprite(0, 0, 512, 230, hillKey("hill-near", palette.hillNear, 230, 260))
+      .tileSprite(0, 0, 512, 320, hillKey("hill-near", palette.hillNear, 320, 240))
       .setOrigin(0, 1)
       .setDepth(2);
+
 
     this.layoutBackdrop();
   }
@@ -354,13 +358,14 @@ export class GameScene extends Phaser.Scene {
     // Hills keep their world-space footing (based at the ground line) while
     // following the camera horizontally with parallax tile offsets.
     if (this.hillFar) {
-      this.hillFar.setPosition(x, GROUND_Y + 40).setSize(w, 300);
+      this.hillFar.setPosition(x, GROUND_Y + 40).setSize(w, 210);
       this.hillFar.tilePositionX = cam.scrollX * 0.75 + x * 0.25;
     }
     if (this.hillNear) {
-      this.hillNear.setPosition(x, GROUND_Y + 60).setSize(w, 230);
+      this.hillNear.setPosition(x, GROUND_Y + 60).setSize(w, 320);
       this.hillNear.tilePositionX = cam.scrollX * 0.5 + x * 0.5;
     }
+
   }
 
 
@@ -368,10 +373,17 @@ export class GameScene extends Phaser.Scene {
     if (!this.anims.exists("parth-run")) {
       this.anims.create({
         key: "parth-run",
-        frames: [{ key: "parth-run-a" }, { key: "parth-idle" }, { key: "parth-run-b" }],
-        frameRate: 10,
+        // Four-pose leg cycle: stride → pass → opposite stride → pass.
+        frames: [
+          { key: "parth-run-a" },
+          { key: "parth-run-b" },
+          { key: "parth-run-c" },
+          { key: "parth-run-d" },
+        ],
+        frameRate: 12,
         repeat: -1,
       });
+
       this.anims.create({
         key: "coin-spin",
         frames: [{ key: "coin-a" }, { key: "coin-b" }],
@@ -601,9 +613,10 @@ export class GameScene extends Phaser.Scene {
       if (this.player.anims.currentAnim?.key !== "parth-run") {
         this.player.anims.play("parth-run", true);
       }
-      // Bouncy run: gentle body tilt plus a subtle stride bob.
-      this.player.setAngle(Math.sin(this.time.now / 70) * 3);
-      this.player.setScale(1, 1 + Math.sin(this.time.now / 70) * 0.04);
+      // Subtle stride bob only — the leg frames carry the run now.
+      this.player.setAngle(Math.sin(this.time.now / 90) * 1.5);
+      this.player.setScale(1, 1 + Math.sin(this.time.now / 90) * 0.02);
+
     } else {
       this.player.anims.stop();
       this.player.setTexture("parth-idle");
