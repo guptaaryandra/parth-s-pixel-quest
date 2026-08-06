@@ -548,8 +548,10 @@ export class GameScene extends Phaser.Scene {
   }
 
   override update() {
+    this.layoutBackdrop();
     if (this.finished) return;
     this.updateLurkers();
+
 
     const body = this.player.body as Phaser.Physics.Arcade.Body;
     const onGround = body.blocked.down || body.touching.down;
