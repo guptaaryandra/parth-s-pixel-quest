@@ -233,8 +233,9 @@ export function GameShell() {
   const portrait = view.w > 0 && view.h > view.w;
   const stageW = portrait ? view.h : view.w;
   const stageH = portrait ? view.w : view.h;
-  const boxW = Math.min(stageW, (stageH * 16) / 9);
-  const boxH = (boxW * 9) / 16;
+  // Fill the whole screen — no letterboxing.
+  const boxW = stageW;
+  const boxH = stageH;
 
   return (
     <div

@@ -36,7 +36,7 @@ export function PhaserCanvas({ paused, restartKey, level, startScore, startLives
         height: GAME_SIZE.height,
         pixelArt: true,
         scale: {
-          mode: PhaserLib.Scale.FIT,
+          mode: PhaserLib.Scale.ENVELOP,
           autoCenter: PhaserLib.Scale.CENTER_BOTH,
         },
         physics: {
