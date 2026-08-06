@@ -40,7 +40,7 @@ export class GameScene extends Phaser.Scene {
   private jumpWasDown = false;
   private magnet = false;
   private shielded = false;
-  private shieldRing?: Phaser.GameObjects.Arc;
+  private shieldRing: Phaser.GameObjects.Arc | undefined;
   private wallet = 0;
 
   constructor() {
