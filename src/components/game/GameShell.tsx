@@ -42,17 +42,32 @@ import { TouchPad } from "./TouchPad";
 function useViewport() {
   const [size, setSize] = useState({ w: 0, h: 0 });
   useEffect(() => {
-    const update = () => setSize({ w: window.innerWidth, h: window.innerHeight });
+    const read = () => {
+      const vv = window.visualViewport;
+      setSize({
+        w: Math.round(vv?.width ?? window.innerWidth),
+        h: Math.round(vv?.height ?? window.innerHeight),
+      });
+    };
+    // Some devices report stale sizes right after a rotation event.
+    const update = () => {
+      read();
+      window.setTimeout(read, 120);
+      window.setTimeout(read, 400);
+    };
     update();
     window.addEventListener("resize", update);
     window.addEventListener("orientationchange", update);
+    window.visualViewport?.addEventListener("resize", update);
     return () => {
       window.removeEventListener("resize", update);
       window.removeEventListener("orientationchange", update);
+      window.visualViewport?.removeEventListener("resize", update);
     };
   }, []);
   return size;
 }
+
 
 export function GameShell() {
   const [status, setStatus] = useState<GameStatus>("start");
