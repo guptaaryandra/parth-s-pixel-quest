@@ -560,7 +560,7 @@ export class Backdrop {
       .setAlpha(0.9);
 
     this.treesFar = s.add
-      .tileSprite(0, 0, TW, 260, this.treeBand("treesFar", 260, shade(b.far, -0.12), 6, 0.9))
+      .tileSprite(0, 0, TW, 260, this.treeBand("treesFar", 260, 0xff0000, 6, 0.9))
       .setOrigin(0, 1)
       .setDepth(1);
 
