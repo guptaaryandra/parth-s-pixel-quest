@@ -587,9 +587,9 @@ export class Backdrop {
 
     this.fg = s.add
       .tileSprite(0, 0, TW, 140, this.fgKey())
-      .setOrigin(0, 0)
+      .setOrigin(0, 1)
       .setDepth(7)
-      .setAlpha(0.5);
+      .setAlpha(0.22);
 
     // Fireflies / sparkles: a small pool of glowing motes drifting near the path.
     const rnd = rng(99);
@@ -635,7 +635,7 @@ export class Backdrop {
       this.props.setSize(w, 200);
       this.mist.setSize(w, 160);
       this.foliage.setSize(w, 170);
-      this.fg.setSize(w, h);
+      this.fg.setSize(w, Math.min(h, 300));
     }
 
     const sx = cam.scrollX;
@@ -667,7 +667,8 @@ export class Backdrop {
     this.foliage.setPosition(x, gy + 24);
     this.foliage.tilePositionX = sx * 0.14 + x * 0.86;
 
-    this.fg.setPosition(x, y);
+    // Foreground haze hugs the lower half so it never veils the sky or moon.
+    this.fg.setPosition(x, gy + 40);
     this.fg.tilePositionX = sx * 1.12 + this.scene.time.now * 0.01;
     this.fg.tilePositionY = Math.sin(this.scene.time.now * 0.0004) * 20;
 
