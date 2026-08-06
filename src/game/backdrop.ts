@@ -536,20 +536,20 @@ export class Backdrop {
     const b = this.biome;
     const gy = this.groundY;
 
-    this.sky = s.add.image(0, 0, this.skyKey()).setOrigin(0, 0).setDepth(-3);
-    this.stars = s.add.tileSprite(0, 0, TW, TW, this.starsKey()).setOrigin(0, 0).setDepth(-2).setAlpha(0.9);
+    this.sky = s.add.image(0, 0, this.skyKey()).setOrigin(0, 0).setDepth(-4);
+    this.stars = s.add.tileSprite(0, 0, TW, TW, this.starsKey()).setOrigin(0, 0).setDepth(-3).setAlpha(0.9);
     s.tweens.add({ targets: this.stars, alpha: 0.55, duration: 2400, yoyo: true, repeat: -1 });
 
     this.clouds = s.add
       .tileSprite(0, 0, TW, 200, this.cloudsKey())
       .setOrigin(0, 0)
-      .setDepth(-1)
-      .setAlpha(0);
+      .setDepth(-2)
+      .setAlpha(0.55);
 
     // Moon sits in front of the cloud band so it stays clean and bright.
-    this.moonGlow = s.add.circle(0, 0, 96, b.moon, 0.14).setDepth(-0.5);
+    this.moonGlow = s.add.circle(0, 0, 96, b.moon, 0.14).setDepth(-1);
     this.moonGlow.setBlendMode(Phaser.BlendModes.ADD);
-    this.moon = s.add.circle(0, 0, 50, b.moon, 1).setDepth(-0.5);
+    this.moon = s.add.circle(0, 0, 50, b.moon, 1).setDepth(-1);
     s.tweens.add({ targets: this.moonGlow, scale: 1.15, alpha: 0.22, duration: 3200, yoyo: true, repeat: -1 });
 
     this.ridge = s.add
