@@ -181,6 +181,20 @@ export function GameShell() {
     setStatus("start");
   };
 
+  const openSettings = () => {
+    sfx.click();
+    controls.left = controls.right = controls.jump = false;
+    setStatus((s) => (s === "playing" ? "paused" : s));
+    setStatus("settings");
+  };
+
+  /** Live preview + autosave of the control layout. */
+  const updateLayout = (next: ControlsLayout) => setLayout(saveLayout(next));
+
+  const resetControls = () => {
+    sfx.click();
+    setLayout(resetLayout());
+  };
 
   const togglePause = () =>
     setStatus((s) => (s === "playing" ? "paused" : s === "paused" ? "playing" : s));
@@ -206,17 +220,37 @@ export function GameShell() {
     return () => window.removeEventListener("keydown", onKey);
   });
 
-  const portrait = useIsPortrait();
+  const view = useViewport();
   const running = status === "playing" || status === "paused";
   const inGame = running || status === "levelclear" || status === "gameover" || status === "victory";
   const level = getLevel(levelIndex);
+
+  /**
+   * The OS lock is not always available (browsers without Auto-Rotate, iOS).
+   * In that case we rotate the whole stage ourselves so the game is still
+   * played sideways — the player never has to touch Auto-Rotate.
+   */
+  const portrait = view.w > 0 && view.h > view.w;
+  const stageW = portrait ? view.h : view.w;
+  const stageH = portrait ? view.w : view.h;
+  const boxW = Math.min(stageW, (stageH * 16) / 9);
+  const boxH = (boxW * 9) / 16;
 
   return (
     <div
       ref={frameRef}
       className="fixed inset-0 z-40 flex items-center justify-center overflow-hidden bg-background"
     >
-      <div className="relative aspect-video max-h-screen w-full max-w-[calc(100vh*16/9)]">
+      <div
+        className="flex items-center justify-center"
+        style={{
+          width: stageW,
+          height: stageH,
+          transform: portrait ? "rotate(90deg)" : undefined,
+        }}
+      >
+      <div className="relative" style={{ width: boxW, height: boxH }}>
+
         {inGame ? (
           <PhaserCanvas
             paused={status !== "playing"}
