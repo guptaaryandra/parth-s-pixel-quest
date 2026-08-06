@@ -477,22 +477,30 @@ export class GameScene extends Phaser.Scene {
     const jump = controls.jump || this.cursors.up.isDown || this.cursors.space.isDown;
 
     if (left) {
-      this.player.setVelocityX(-230);
+      this.player.setVelocityX(-this.runSpeed);
       this.player.setFlipX(true);
     } else if (right) {
-      this.player.setVelocityX(230);
+      this.player.setVelocityX(this.runSpeed);
       this.player.setFlipX(false);
     } else {
       this.player.setVelocityX(0);
     }
 
-    if (jump && onGround) {
+    if (onGround) this.jumpsLeft = this.maxJumps;
+    const jumpPressed = jump && !this.jumpWasDown;
+    this.jumpWasDown = jump;
+    if (jumpPressed && this.jumpsLeft > 0) {
+      this.jumpsLeft -= 1;
       this.player.setVelocityY(-680);
       sfx.jump();
     }
 
+    this.updateMagnet();
+    this.shieldRing?.setPosition(this.player.x, this.player.y);
+
     if (onGround && !this.wasOnGround) sfx.land();
     this.wasOnGround = onGround;
+
 
     if (!onGround) {
       this.player.setTexture("parth-jump");
