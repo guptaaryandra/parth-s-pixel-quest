@@ -368,10 +368,17 @@ export class GameScene extends Phaser.Scene {
     if (!this.anims.exists("parth-run")) {
       this.anims.create({
         key: "parth-run",
-        frames: [{ key: "parth-run-a" }, { key: "parth-idle" }, { key: "parth-run-b" }],
-        frameRate: 10,
+        // Four-pose leg cycle: stride → pass → opposite stride → pass.
+        frames: [
+          { key: "parth-run-a" },
+          { key: "parth-run-b" },
+          { key: "parth-run-c" },
+          { key: "parth-run-d" },
+        ],
+        frameRate: 12,
         repeat: -1,
       });
+
       this.anims.create({
         key: "coin-spin",
         frames: [{ key: "coin-a" }, { key: "coin-b" }],
