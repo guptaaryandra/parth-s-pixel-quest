@@ -250,75 +250,111 @@ export class GameScene extends Phaser.Scene {
   }
 
   /**
-   * Responsive ("expand") scaling, the way modern mobile games do it:
-   * the vertical field of view is fixed to the design height, so the pixel
-   * scale is identical on every device — no stretching, no zoom-to-fill.
-   * Wider aspect ratios simply reveal more world horizontally.
-   * The only clamp is a max horizontal view so ultra-wide screens (21:9,
-   * foldables) can't see further than the level design intends.
+   * Camera-viewport scaling (Celeste / Dead Cells style).
+   *
+   * We never scale or stretch the canvas: the canvas is 1:1 with the device and
+   * the *camera* decides how much world is visible. The vertical field of view
+   * is fixed at VIEW_H world px (~2/3 of the old 720) so the hero and platforms
+   * read big, and wider screens simply reveal a little more world sideways —
+   * clamped so ultra-wide devices never see past the level design.
+   * Zoom is snapped to 1/4 steps to keep pixel art crisp.
    */
   private applyZoom() {
     const { width, height } = this.scale.gameSize;
     if (!width || !height) return;
-    const MAX_VIEW_W = 1600; // world px visible at most
-    const zoom = Math.max(height / WORLD_H, width / MAX_VIEW_W);
+    const VIEW_H = 480; // world px visible vertically (was 720 → 33% tighter)
+    const MAX_VIEW_W = 1100; // widest horizontal window we ever allow
+    const MIN_VIEW_W = 600;
+    let zoom = height / VIEW_H;
+    if (width / zoom > MAX_VIEW_W) zoom = width / MAX_VIEW_W;
+    if (width / zoom < MIN_VIEW_W) zoom = width / MIN_VIEW_W;
+    // Snap to quarter steps for stable, non-shimmering pixels.
+    zoom = Math.max(0.5, Math.round(zoom * 4) / 4);
     this.cameras.main.setZoom(zoom);
+    this.layoutBackdrop();
   }
 
   private buildBackground(palette: ReturnType<typeof getLevel>["palette"]) {
-    const g = this.add.graphics().setScrollFactor(0).setDepth(0);
-    g.fillGradientStyle(palette.skyTop, palette.skyTop, palette.skyBottom, palette.skyBottom, 1);
-    g.fillRect(0, 0, 1200, WORLD_H);
-
-    const moon = this.add.circle(1060, 210, 54, palette.moon, 0.92).setScrollFactor(0).setDepth(1);
-    this.tweens.add({ targets: moon, alpha: 0.7, duration: 2600, yoyo: true, repeat: -1 });
-
-    for (let i = 0; i < 70; i++) {
-      const star = this.add
-        .rectangle(
-          Phaser.Math.Between(0, 1200),
-          Phaser.Math.Between(0, 420),
-          2,
-          2,
-          0xffffff,
-          Phaser.Math.FloatBetween(0.3, 1),
-        )
-        .setScrollFactor(0)
-        .setDepth(1);
-      this.tweens.add({
-        targets: star,
-        alpha: 0.15,
-        duration: Phaser.Math.Between(900, 2600),
-        yoyo: true,
-        repeat: -1,
-      });
+    const skyKey = `sky-${this.levelIndex}`;
+    if (!this.textures.exists(skyKey)) {
+      const g = this.make.graphics({ x: 0, y: 0 }, false);
+      g.fillGradientStyle(palette.skyTop, palette.skyTop, palette.skyBottom, palette.skyBottom, 1);
+      g.fillRect(0, 0, 16, WORLD_H);
+      g.generateTexture(skyKey, 16, WORLD_H);
+      g.destroy();
     }
-
-    const hills = this.add.graphics().setScrollFactor(0.25).setDepth(2);
-    hills.fillStyle(palette.hillFar, 1);
-    for (let i = 0; i < 14; i++) {
-      hills.fillTriangle(
-        i * 340 - 100,
-        GROUND_Y + 40,
-        i * 340 + 90,
-        320,
-        i * 340 + 280,
-        GROUND_Y + 40,
-      );
+    const starKey = `stars-${this.levelIndex}`;
+    if (!this.textures.exists(starKey)) {
+      const g = this.make.graphics({ x: 0, y: 0 }, false);
+      for (let i = 0; i < 90; i++) {
+        g.fillStyle(0xffffff, Phaser.Math.FloatBetween(0.25, 1));
+        g.fillRect(Phaser.Math.Between(0, 511), Phaser.Math.Between(0, 511), 2, 2);
+      }
+      g.generateTexture(starKey, 512, 512);
+      g.destroy();
     }
-    const hills2 = this.add.graphics().setScrollFactor(0.5).setDepth(2);
-    hills2.fillStyle(palette.hillNear, 1);
-    for (let i = 0; i < 16; i++) {
-      hills2.fillTriangle(
-        i * 260 - 60,
-        GROUND_Y + 60,
-        i * 260 + 80,
-        430,
-        i * 260 + 220,
-        GROUND_Y + 60,
-      );
+    const hillKey = (name: string, color: number, h: number, step: number) => {
+      const key = `${name}-${this.levelIndex}`;
+      if (this.textures.exists(key)) return key;
+      const g = this.make.graphics({ x: 0, y: 0 }, false);
+      g.fillStyle(color, 1);
+      for (let i = -1; i <= Math.ceil(512 / step) + 1; i++) {
+        g.fillTriangle(i * step, h, i * step + step * 0.5, 0, i * step + step, h);
+      }
+      g.fillRect(0, h - 2, 512, 2);
+      g.generateTexture(key, 512, h);
+      g.destroy();
+      return key;
+    };
+
+    // Sky + stars are pinned to the camera window and stretched to cover it,
+    // so there is never a visible backdrop edge or empty margin.
+    this.sky = this.add.image(0, 0, skyKey).setOrigin(0, 0).setDepth(0);
+    this.stars = this.add.tileSprite(0, 0, 512, 512, starKey).setOrigin(0, 0).setDepth(1);
+    this.moon = this.add.circle(0, 0, 54, palette.moon, 0.92).setDepth(1);
+    this.tweens.add({ targets: this.moon, alpha: 0.7, duration: 2600, yoyo: true, repeat: -1 });
+
+    // Parallax hill bands: seamless tiling textures whose scroll is driven from
+    // the camera, so they extend forever instead of running out of world.
+    this.hillFar = this.add
+      .tileSprite(0, 0, 512, 300, hillKey("hill-far", palette.hillFar, 300, 340))
+      .setOrigin(0, 1)
+      .setDepth(2);
+    this.hillNear = this.add
+      .tileSprite(0, 0, 512, 230, hillKey("hill-near", palette.hillNear, 230, 260))
+      .setOrigin(0, 1)
+      .setDepth(2);
+
+    this.layoutBackdrop();
+  }
+
+  /** Keeps every backdrop layer glued to (and covering) the camera viewport. */
+  private layoutBackdrop() {
+    const cam = this.cameras.main;
+    const view = cam.worldView;
+    if (!view.width || !this.sky) return;
+    const w = Math.ceil(view.width) + 2;
+    const h = Math.ceil(view.height) + 2;
+    const x = Math.floor(view.x);
+    const y = Math.floor(view.y);
+
+    this.sky.setPosition(x, y).setDisplaySize(w, h);
+    this.stars?.setPosition(x, y).setSize(w, Math.min(h, 420));
+    if (this.stars) this.stars.tilePositionX = cam.scrollX * 0.1;
+    this.moon?.setPosition(x + w * 0.78, y + h * 0.22);
+
+    // Hills keep their world-space footing (based at the ground line) while
+    // following the camera horizontally with parallax tile offsets.
+    if (this.hillFar) {
+      this.hillFar.setPosition(x, GROUND_Y + 40).setSize(w, 300);
+      this.hillFar.tilePositionX = cam.scrollX * 0.75 + x * 0.25;
+    }
+    if (this.hillNear) {
+      this.hillNear.setPosition(x, GROUND_Y + 60).setSize(w, 230);
+      this.hillNear.tilePositionX = cam.scrollX * 0.5 + x * 0.5;
     }
   }
+
 
   private buildAnimations() {
     if (!this.anims.exists("parth-run")) {
