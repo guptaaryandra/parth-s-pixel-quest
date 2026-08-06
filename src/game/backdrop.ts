@@ -264,8 +264,8 @@ export class Backdrop {
         const s = scale * (0.78 + rnd() * 0.44);
         tiled(x, (cx) => this.drawTree(g, cx, h, s, color, rnd));
       }
-      g.fillStyle(color, 1);
-      g.fillRect(0, h - 14, TW, 14);
+      g.fillStyle(shade(color, -0.25), 1);
+      g.fillRect(0, h - 10, TW, 10);
       void b;
     });
   }
@@ -506,11 +506,14 @@ export class Backdrop {
 
   private mistKey() {
     return this.tex("mist", 160, (g, rnd) => {
-      for (let i = 0; i < 12; i++) {
-        g.fillStyle(this.biome.mist, 0.06 + rnd() * 0.06);
-        const y = 20 + rnd() * 110;
-        const w = 120 + rnd() * 180;
-        g.fillRect(rnd() * TW - w / 2, y, w, 22 + rnd() * 26);
+      for (let i = 0; i < 16; i++) {
+        g.fillStyle(this.biome.mist, 0.035 + rnd() * 0.035);
+        const y = 30 + rnd() * 100;
+        const r = 26 + rnd() * 22;
+        const cx = rnd() * TW;
+        tiled(cx, (px) => {
+          for (let k = -3; k <= 3; k++) blob(g, px + k * r * 0.85, y + Math.abs(k) * 4, r * (1 - Math.abs(k) * 0.15));
+        });
       }
     });
   }
@@ -544,8 +547,8 @@ export class Backdrop {
       .setAlpha(0.6);
 
     // Moon sits in front of the cloud band so it stays clean and bright.
-    this.moonGlow = s.add.circle(0, 0, 96, b.moon, 0.14).setDepth(0);
-    this.moon = s.add.circle(0, 0, 50, b.moon, 1).setDepth(0);
+    this.moonGlow = s.add.circle(0, 0, 96, b.moon, 0.14).setDepth(0.5);
+    this.moon = s.add.circle(0, 0, 50, b.moon, 1).setDepth(0.6);
     s.tweens.add({ targets: this.moonGlow, scale: 1.15, alpha: 0.22, duration: 3200, yoyo: true, repeat: -1 });
 
     this.ridge = s.add
@@ -555,13 +558,13 @@ export class Backdrop {
       .setAlpha(0.5);
 
     this.treesFar = s.add
-      .tileSprite(0, 0, TW, 260, this.treeBand("treesFar", 260, b.far, 5, 1.1))
+      .tileSprite(0, 0, TW, 260, this.treeBand("treesFar", 260, b.far, 6, 0.9))
       .setOrigin(0, 1)
       .setDepth(1)
       .setAlpha(0.62);
 
     this.treesMid = s.add
-      .tileSprite(0, 0, TW, 300, this.treeBand("treesMid", 300, shade(b.mid, 0.08), 4, 1.35))
+      .tileSprite(0, 0, TW, 300, this.treeBand("treesMid", 300, shade(b.mid, 0.08), 5, 1.05))
       .setOrigin(0, 1)
       .setDepth(2);
 
