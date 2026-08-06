@@ -102,8 +102,10 @@ export class GameScene extends Phaser.Scene {
     }
 
     const coins = this.physics.add.staticGroup();
+    this.coins = coins;
     for (const [tx, y] of layout.coins) {
       const coin = coins.create(tx * TILE, y, "coin-a") as Phaser.Physics.Arcade.Sprite;
+
       coin.setDepth(4);
       coin.anims.play("coin-spin");
       this.tweens.add({
