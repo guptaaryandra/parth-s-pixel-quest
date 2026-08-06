@@ -236,9 +236,9 @@ export function GameShell() {
   const portrait = view.w > 0 && view.h > view.w;
   const stageW = portrait ? view.h : view.w;
   const stageH = portrait ? view.w : view.h;
-  // Keep a true 16:9 play area so nothing looks stretched.
-  const boxW = Math.min(stageW, (stageH * 16) / 9);
-  const boxH = Math.min(stageH, (stageW * 9) / 16);
+  // Fill the whole screen; the canvas adapts its view instead of stretching.
+  const boxW = stageW;
+  const boxH = stageH;
 
   return (
     <div

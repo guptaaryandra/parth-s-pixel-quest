@@ -36,8 +36,10 @@ export function PhaserCanvas({ paused, restartKey, level, startScore, startLives
         height: GAME_SIZE.height,
         pixelArt: true,
         scale: {
-          mode: PhaserLib.Scale.FIT,
-          autoCenter: PhaserLib.Scale.CENTER_BOTH,
+          // RESIZE: the canvas matches the container exactly, so the view fills
+          // the screen edge-to-edge without ever stretching the pixel art.
+          mode: PhaserLib.Scale.RESIZE,
+          autoCenter: PhaserLib.Scale.NO_CENTER,
         },
         physics: {
           default: "arcade",
