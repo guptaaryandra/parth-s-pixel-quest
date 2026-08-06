@@ -5,6 +5,7 @@ export const controls: Controls = { left: false, right: false, jump: false };
 export type GameStatus =
   | "start"
   | "levelselect"
+  | "shop"
   | "playing"
   | "paused"
   | "levelclear"
@@ -14,12 +15,17 @@ export type GameStatus =
 export type StatePatch = {
   score: number;
   lives: number;
+  maxLives: number;
   crystals: number;
   totalCrystals: number;
   level: number;
   totalLevels: number;
+  /** Coins banked in the shop wallet. */
+  wallet: number;
+  shielded: boolean;
   status?: "levelclear" | "gameover" | "victory";
 };
+
 
 type Listener = (payload: any) => void;
 

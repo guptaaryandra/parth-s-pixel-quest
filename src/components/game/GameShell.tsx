@@ -6,6 +6,7 @@ import {
   Play,
   RotateCcw,
   RotateCw,
+  ShoppingBag,
   Volume2,
   VolumeX,
 } from "lucide-react";
@@ -15,9 +16,17 @@ import { controls, type GameStatus, type StatePatch } from "@/game/state";
 import { getLevel, TOTAL_LEVELS } from "@/game/levels";
 import { sfx } from "@/game/audio";
 import { completeLevel, loadProgress } from "@/game/progress";
+import {
+  buyItem,
+  equipOutfit,
+  hasPower,
+  loadShop,
+  type ShopState,
+} from "@/game/shop";
 import { Hud } from "./Hud";
 import { Overlay } from "./Overlay";
 import { LevelSelect } from "./LevelSelect";
+import { Shop } from "./Shop";
 import { TouchPad } from "./TouchPad";
 
 function useIsPortrait() {
@@ -38,11 +47,14 @@ export function GameShell() {
   const [levelIndex, setLevelIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
+  const [maxLives, setMaxLives] = useState(3);
   const [crystals, setCrystals] = useState(0);
   const [totalCrystals, setTotalCrystals] = useState(5);
   const [muted, setMuted] = useState(false);
   const [unlocked, setUnlocked] = useState(0);
   const [best, setBest] = useState<Record<number, number>>({});
+  const [shop, setShop] = useState<ShopState>({ coins: 0, owned: ["default"], outfit: "default" });
+  const [shielded, setShielded] = useState(false);
   const frameRef = useRef<HTMLDivElement>(null);
   const levelRef = useRef(0);
   levelRef.current = levelIndex;
@@ -52,7 +64,13 @@ export function GameShell() {
     const p = loadProgress();
     setUnlocked(Math.min(p.unlocked, TOTAL_LEVELS - 1));
     setBest(p.best);
+    const s = loadShop();
+    setShop(s);
+    const startLives = 3 + (hasPower(s, "extra-heart") ? 1 : 0);
+    setMaxLives(startLives);
+    setLives(startLives);
   }, []);
+
 
   /** Full screen is the default experience — request it on the first user gesture. */
   const enterFullscreen = () => {
@@ -72,8 +90,11 @@ export function GameShell() {
   const onState = useCallback((patch: StatePatch) => {
     setScore(patch.score);
     setLives(patch.lives);
+    setMaxLives(patch.maxLives);
     setCrystals(patch.crystals);
     setTotalCrystals(patch.totalCrystals);
+    setShielded(patch.shielded);
+    setShop((s) => (s.coins === patch.wallet ? s : { ...s, coins: patch.wallet }));
     if (patch.status) {
       setStatus(patch.status);
       if (patch.status === "levelclear" || patch.status === "victory") {
@@ -97,6 +118,8 @@ export function GameShell() {
     setStatus("playing");
   };
 
+  const freshLives = () => 3 + (hasPower(loadShop(), "extra-heart") ? 1 : 0);
+
   const openLevelSelect = () => {
     sfx.click();
     sfx.unlock();
@@ -105,9 +128,27 @@ export function GameShell() {
     setStatus("levelselect");
   };
 
+  const openShop = () => {
+    sfx.click();
+    sfx.unlock();
+    controls.left = controls.right = controls.jump = false;
+    setShop(loadShop());
+    setStatus("shop");
+  };
+
+  const purchase = (id: string, price: number) => {
+    sfx.crystal();
+    setShop(buyItem(id, price));
+  };
+
+  const equip = (id: string) => {
+    sfx.click();
+    setShop(equipOutfit(id));
+  };
+
   const selectLevel = (index: number) => {
     sfx.click();
-    launch(index, 0, 3);
+    launch(index, 0, freshLives());
   };
 
   const nextLevel = () => {
@@ -117,7 +158,7 @@ export function GameShell() {
 
   const retryLevel = () => {
     sfx.click();
-    launch(levelIndex, score, 3);
+    launch(levelIndex, score, freshLives());
   };
 
   const goHome = () => {
@@ -125,6 +166,7 @@ export function GameShell() {
     controls.left = controls.right = controls.jump = false;
     setStatus("start");
   };
+
 
   const togglePause = () =>
     setStatus((s) => (s === "playing" ? "paused" : s === "paused" ? "playing" : s));
@@ -179,11 +221,14 @@ export function GameShell() {
             <Hud
               score={score}
               lives={lives}
+              maxLives={maxLives}
               crystals={crystals}
               totalCrystals={totalCrystals}
               level={levelIndex + 1}
               totalLevels={TOTAL_LEVELS}
               levelName={level.name}
+              wallet={shop.coins}
+              shielded={shielded}
             />
             <TouchPad />
           </>
@@ -210,6 +255,17 @@ export function GameShell() {
               <LayoutGrid size={18} />
             </button>
           )}
+          {status !== "shop" && !running && (
+            <button
+              type="button"
+              onPointerUp={openShop}
+              aria-label="Open shop"
+              className="touch-manipulation rounded-xl border border-border bg-panel/80 p-2 text-foreground backdrop-blur transition hover:bg-accent"
+            >
+              <ShoppingBag size={18} />
+            </button>
+          )}
+
           <button
             type="button"
             onPointerUp={toggleMute}
@@ -249,6 +305,10 @@ export function GameShell() {
           />
         )}
 
+        {status === "shop" && (
+          <Shop state={shop} onBuy={purchase} onEquip={equip} onBack={goHome} />
+        )}
+
         {portrait && (
           <div className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-background/95 p-6 text-center">
             <RotateCw className="size-10 animate-pulse text-crystal" />
@@ -269,12 +329,15 @@ export function GameShell() {
           levelName={level.name}
           levelTagline={level.tagline}
           nextLevelName={getLevel(levelIndex + 1).name}
+          wallet={shop.coins}
           onPlay={openLevelSelect}
+          onShop={openShop}
           onResume={togglePause}
           onNextLevel={nextLevel}
           onRetryLevel={retryLevel}
           onGoHome={goHome}
         />
+
       </div>
     </div>
   );

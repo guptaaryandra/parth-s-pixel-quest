@@ -3,6 +3,7 @@ import { buildTextures } from "./pixels";
 import { controls, gameBus } from "./state";
 import { buildLayout, getLevel, TOTAL_LEVELS } from "./levels";
 import { sfx } from "./audio";
+import { addCoins, hasPower, loadShop, outfitColors, type ShopState } from "./shop";
 
 const TILE = 64;
 const WORLD_H = 720;
@@ -16,11 +17,13 @@ export class GameScene extends Phaser.Scene {
   private monsters!: Phaser.Physics.Arcade.Group;
   private lurkers!: Phaser.Physics.Arcade.Group;
   private flyers!: Phaser.Physics.Arcade.Group;
+  private coins!: Phaser.Physics.Arcade.StaticGroup;
 
   private solids!: Phaser.Physics.Arcade.StaticGroup;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private score = 0;
   private lives = 3;
+  private maxLives = 3;
   private levelIndex = 0;
   private crystalsFound = 0;
   private totalCrystals = 5;
@@ -29,6 +32,17 @@ export class GameScene extends Phaser.Scene {
   private finished = false;
   private wasOnGround = true;
 
+  // Shop-driven perks
+  private shop: ShopState = { coins: 0, owned: ["default"], outfit: "default" };
+  private runSpeed = 230;
+  private maxJumps = 1;
+  private jumpsLeft = 1;
+  private jumpWasDown = false;
+  private magnet = false;
+  private shielded = false;
+  private shieldRing: Phaser.GameObjects.Arc | undefined;
+  private wallet = 0;
+
   constructor() {
     super("game");
   }
@@ -36,11 +50,18 @@ export class GameScene extends Phaser.Scene {
   init(data: SceneInit) {
     this.levelIndex = data.level ?? 0;
     this.score = data.score ?? 0;
-    this.lives = data.lives ?? 3;
+    this.shop = loadShop();
+    this.wallet = this.shop.coins;
+    this.maxLives = 3 + (hasPower(this.shop, "extra-heart") ? 1 : 0);
+    this.lives = data.lives ?? this.maxLives;
+    this.runSpeed = hasPower(this.shop, "swift-boots") ? 300 : 230;
+    this.maxJumps = hasPower(this.shop, "double-jump") ? 2 : 1;
+    this.magnet = hasPower(this.shop, "magnet");
+    this.shielded = hasPower(this.shop, "shield");
   }
 
   preload() {
-    buildTextures(this);
+    buildTextures(this, outfitColors(this.shop.outfit));
   }
 
   create() {
@@ -50,7 +71,9 @@ export class GameScene extends Phaser.Scene {
     this.totalCrystals = layout.crystals.length;
     this.finished = false;
     this.invulnerableUntil = 0;
+    this.jumpsLeft = this.maxJumps;
     this.worldWidth = cfg.tiles * TILE;
+
 
     this.physics.world.setBounds(0, 0, this.worldWidth, WORLD_H);
     this.cameras.main.setBounds(0, 0, this.worldWidth, WORLD_H);
@@ -79,8 +102,10 @@ export class GameScene extends Phaser.Scene {
     }
 
     const coins = this.physics.add.staticGroup();
+    this.coins = coins;
     for (const [tx, y] of layout.coins) {
       const coin = coins.create(tx * TILE, y, "coin-a") as Phaser.Physics.Arcade.Sprite;
+
       coin.setDepth(4);
       coin.anims.play("coin-spin");
       this.tweens.add({
@@ -177,15 +202,19 @@ export class GameScene extends Phaser.Scene {
     this.player.body?.setSize(28, 44);
     this.player.setOffset(7, 4);
 
+    if (this.shielded) this.addShieldRing();
+
     this.physics.add.collider(this.player, this.solids);
     this.physics.add.overlap(this.player, coins, (_p, obj) => {
       const coin = obj as Phaser.Physics.Arcade.Sprite;
       coin.disableBody(true, true);
       this.score += 10;
+      this.wallet = addCoins(1).coins;
       sfx.coin();
       this.emitState();
       this.pop(coin.x, coin.y, 0xffc94a);
     });
+
     this.physics.add.overlap(this.player, crystals, (_p, obj) => {
       const gem = obj as Phaser.Physics.Arcade.Sprite;
       gem.disableBody(true, true);
@@ -312,8 +341,49 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  /** Aura shield perk: a glowing ring that soaks the first hit of the level. */
+  private addShieldRing() {
+    this.shieldRing = this.add.circle(this.player.x, this.player.y, 32, 0x7de1ff, 0.18).setDepth(4);
+    this.shieldRing.setStrokeStyle(2, 0x7de1ff, 0.8);
+    this.tweens.add({
+      targets: this.shieldRing,
+      scale: 1.12,
+      alpha: 0.5,
+      duration: 900,
+      yoyo: true,
+      repeat: -1,
+    });
+  }
+
+  /** Coin magnet perk: pulls nearby coins toward Parth. */
+  private updateMagnet() {
+    if (!this.magnet) return;
+    for (const obj of this.coins.getChildren()) {
+      const coin = obj as Phaser.Physics.Arcade.Sprite;
+      if (!coin.active) continue;
+      const d = Phaser.Math.Distance.Between(coin.x, coin.y, this.player.x, this.player.y);
+      if (d > 170 || d < 4) continue;
+      const t = 0.14;
+      coin.setPosition(
+        coin.x + (this.player.x - coin.x) * t,
+        coin.y + (this.player.y - coin.y) * t,
+      );
+      coin.body?.reset(coin.x, coin.y);
+    }
+  }
+
   private hurt() {
     if (this.finished || this.time.now < this.invulnerableUntil) return;
+    if (this.shielded) {
+      this.shielded = false;
+      this.invulnerableUntil = this.time.now + 1200;
+      this.shieldRing?.destroy();
+      this.shieldRing = undefined;
+      sfx.hurt();
+      this.pop(this.player.x, this.player.y, 0x7de1ff);
+      this.emitState();
+      return;
+    }
     this.invulnerableUntil = this.time.now + 1400;
     this.lives -= 1;
     sfx.hurt();
@@ -349,13 +419,17 @@ export class GameScene extends Phaser.Scene {
     gameBus.emit("state", {
       score: this.score,
       lives: Math.max(0, this.lives),
+      maxLives: this.maxLives,
       crystals: this.crystalsFound,
       totalCrystals: this.totalCrystals,
       level: this.levelIndex + 1,
       totalLevels: TOTAL_LEVELS,
+      wallet: this.wallet,
+      shielded: this.shielded,
       status,
     });
   }
+
 
   private updateLurkers() {
     for (const obj of this.lurkers.getChildren()) {
@@ -403,22 +477,30 @@ export class GameScene extends Phaser.Scene {
     const jump = controls.jump || this.cursors.up.isDown || this.cursors.space.isDown;
 
     if (left) {
-      this.player.setVelocityX(-230);
+      this.player.setVelocityX(-this.runSpeed);
       this.player.setFlipX(true);
     } else if (right) {
-      this.player.setVelocityX(230);
+      this.player.setVelocityX(this.runSpeed);
       this.player.setFlipX(false);
     } else {
       this.player.setVelocityX(0);
     }
 
-    if (jump && onGround) {
+    if (onGround) this.jumpsLeft = this.maxJumps;
+    const jumpPressed = jump && !this.jumpWasDown;
+    this.jumpWasDown = jump;
+    if (jumpPressed && this.jumpsLeft > 0) {
+      this.jumpsLeft -= 1;
       this.player.setVelocityY(-680);
       sfx.jump();
     }
 
+    this.updateMagnet();
+    this.shieldRing?.setPosition(this.player.x, this.player.y);
+
     if (onGround && !this.wasOnGround) sfx.land();
     this.wasOnGround = onGround;
+
 
     if (!onGround) {
       this.player.setTexture("parth-jump");
