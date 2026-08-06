@@ -343,33 +343,46 @@ export class GameScene extends Phaser.Scene {
     this.layoutBackdrop();
   }
 
-  /** Keeps every backdrop layer glued to (and covering) the camera viewport. */
+  /**
+   * Keeps every backdrop layer glued to (and covering) the camera viewport.
+   * Positions update every frame (cheap); sizes only when the view changes.
+   */
   private layoutBackdrop() {
     const cam = this.cameras.main;
     const view = cam.worldView;
     if (!view.width || !this.sky) return;
-    // A small world-space bleed hides fractional-pixel seams at every zoom.
-    const bleed = 4;
+    // A generous world-space bleed hides fractional-pixel seams at every zoom.
+    const bleed = 8;
     const w = Math.ceil(view.width) + bleed * 2;
     const h = Math.ceil(view.height) + bleed * 2;
     const x = Math.floor(view.x) - bleed;
     const y = Math.floor(view.y) - bleed;
 
-    this.sky.setPosition(x, y).setDisplaySize(w, h);
-    this.stars?.setPosition(x, y).setSize(w, Math.min(h, 420));
-    if (this.stars) this.stars.tilePositionX = cam.scrollX * 0.1;
-    this.moon?.setPosition(x + w * 0.78, y + h * 0.22);
+    if (!this.backdropSize || this.backdropSize.w !== w || this.backdropSize.h !== h) {
+      this.backdropSize = { w, h };
+      this.sky.setDisplaySize(w, h);
+      this.stars?.setSize(w, Math.min(h, 420));
+      this.hillFar?.setSize(w, 210);
+      this.hillNear?.setSize(w, 320);
+    }
 
+    this.sky.setPosition(x, y);
+    this.moon?.setPosition(x + w * 0.78, y + h * 0.22);
+    if (this.stars) {
+      this.stars.setPosition(x, y);
+      this.stars.tilePositionX = cam.scrollX * 0.1;
+    }
     // Hills keep their world-space footing (based at the ground line) while
     // following the camera horizontally with parallax tile offsets.
     if (this.hillFar) {
-      this.hillFar.setPosition(x, GROUND_Y + 40).setSize(w, 210);
+      this.hillFar.setPosition(x, GROUND_Y + 40);
       this.hillFar.tilePositionX = cam.scrollX * 0.75 + x * 0.25;
     }
     if (this.hillNear) {
-      this.hillNear.setPosition(x, GROUND_Y + 60).setSize(w, 320);
+      this.hillNear.setPosition(x, GROUND_Y + 60);
       this.hillNear.tilePositionX = cam.scrollX * 0.5 + x * 0.5;
     }
+
 
   }
 
