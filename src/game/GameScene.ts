@@ -202,15 +202,19 @@ export class GameScene extends Phaser.Scene {
     this.player.body?.setSize(28, 44);
     this.player.setOffset(7, 4);
 
+    if (this.shielded) this.addShieldRing();
+
     this.physics.add.collider(this.player, this.solids);
     this.physics.add.overlap(this.player, coins, (_p, obj) => {
       const coin = obj as Phaser.Physics.Arcade.Sprite;
       coin.disableBody(true, true);
       this.score += 10;
+      this.wallet = addCoins(1).coins;
       sfx.coin();
       this.emitState();
       this.pop(coin.x, coin.y, 0xffc94a);
     });
+
     this.physics.add.overlap(this.player, crystals, (_p, obj) => {
       const gem = obj as Phaser.Physics.Arcade.Sprite;
       gem.disableBody(true, true);
