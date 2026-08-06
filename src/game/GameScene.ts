@@ -344,7 +344,21 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  /** Quick squash-and-stretch pop on Parth for jumps and landings. */
+  private stretch(sx: number, sy: number) {
+    this.tweens.killTweensOf(this.player);
+    this.player.setScale(sx, sy);
+    this.tweens.add({
+      targets: this.player,
+      scaleX: 1,
+      scaleY: 1,
+      duration: 160,
+      ease: "Quad.easeOut",
+    });
+  }
+
   private pop(x: number, y: number, color: number) {
+
     for (let i = 0; i < 8; i++) {
       const bit = this.add.rectangle(x, y, 5, 5, color).setDepth(6);
       this.tweens.add({
@@ -507,30 +521,46 @@ export class GameScene extends Phaser.Scene {
     if (onGround) this.jumpsLeft = this.maxJumps;
     const jumpPressed = jump && !this.jumpWasDown;
     this.jumpWasDown = jump;
-    if (jumpPressed && this.jumpsLeft > 0) {
+    // Holding the jump button keeps hopping: on the ground a held button is
+    // enough, while extra mid-air jumps still need a fresh press.
+    const canJump = onGround ? jump : jumpPressed;
+    if (canJump && this.jumpsLeft > 0) {
       this.jumpsLeft -= 1;
       this.player.setVelocityY(-680);
+      this.stretch(0.82, 1.2);
       sfx.jump();
     }
 
     this.updateMagnet();
     this.shieldRing?.setPosition(this.player.x, this.player.y);
 
-    if (onGround && !this.wasOnGround) sfx.land();
+    if (onGround && !this.wasOnGround) {
+      sfx.land();
+      this.stretch(1.2, 0.8);
+    }
     this.wasOnGround = onGround;
 
 
     if (!onGround) {
       this.player.setTexture("parth-jump");
       this.player.anims.stop();
+      // Lean into the arc: nose up on the way up, down on the way down.
+      this.player.setAngle(Phaser.Math.Clamp(body.velocity.y * 0.02, -8, 8) * (this.player.flipX ? -1 : 1));
     } else if (left || right) {
       if (this.player.anims.currentAnim?.key !== "parth-run") {
         this.player.anims.play("parth-run", true);
       }
+      // Bouncy run: gentle body tilt plus a subtle stride bob.
+      this.player.setAngle(Math.sin(this.time.now / 70) * 3);
+      this.player.setScale(1, 1 + Math.sin(this.time.now / 70) * 0.04);
     } else {
       this.player.anims.stop();
       this.player.setTexture("parth-idle");
+      this.player.setAngle(0);
+      // Idle breathing.
+      this.player.setScale(1, 1 + Math.sin(this.time.now / 320) * 0.03);
     }
+
 
     if (this.player.x < 8) this.player.setX(8);
     if (this.player.x > this.worldWidth - 8) this.player.setX(this.worldWidth - 8);
