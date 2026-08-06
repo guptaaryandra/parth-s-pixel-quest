@@ -265,7 +265,7 @@ export function GameShell() {
         style={{
           width: stageW,
           height: stageH,
-          transform: portrait ? "rotate(90deg)" : undefined,
+          transform: portrait ? `rotate(${fallbackRotation()}deg)` : undefined,
         }}
       >
       <div className="relative" style={{ width: boxW, height: boxH }}>
