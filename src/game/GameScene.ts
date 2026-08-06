@@ -240,11 +240,24 @@ export class GameScene extends Phaser.Scene {
 
 
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
-    this.cameras.main.setZoom(1.35);
+    this.applyZoom();
+    this.scale.on("resize", this.applyZoom, this);
+    this.events.once("shutdown", () => this.scale.off("resize", this.applyZoom, this));
     this.cameras.main.setRoundPixels(true);
     this.cameras.main.fadeIn(320, 0, 0, 0);
     this.cursors = this.input.keyboard!.createCursorKeys();
     this.emitState();
+  }
+
+  /**
+   * Fills the canvas without stretching: the canvas keeps the device aspect
+   * ratio and we zoom just enough that the view never shows past the world.
+   */
+  private applyZoom() {
+    const { width, height } = this.scale.gameSize;
+    if (!width || !height) return;
+    const zoom = Math.max(1.35, height / WORLD_H, width / 1600);
+    this.cameras.main.setZoom(zoom);
   }
 
   private buildBackground(palette: ReturnType<typeof getLevel>["palette"]) {

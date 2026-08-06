@@ -19,6 +19,7 @@ export function PhaserCanvas({ paused, restartKey, level, startScore, startLives
 
   useEffect(() => {
     let cancelled = false;
+    let observer: ResizeObserver | undefined;
     const handler = (patch: StatePatch) => onState(patch);
     gameBus.on("state", handler);
 
@@ -36,8 +37,10 @@ export function PhaserCanvas({ paused, restartKey, level, startScore, startLives
         height: GAME_SIZE.height,
         pixelArt: true,
         scale: {
-          mode: PhaserLib.Scale.FIT,
-          autoCenter: PhaserLib.Scale.CENTER_BOTH,
+          // NONE: we size the canvas ourselves from the container box (the stage
+          // can be CSS-rotated), so the view fills the screen 1:1 — never stretched.
+          mode: PhaserLib.Scale.NONE,
+          autoCenter: PhaserLib.Scale.NO_CENTER,
         },
         physics: {
           default: "arcade",
@@ -50,10 +53,23 @@ export function PhaserCanvas({ paused, restartKey, level, startScore, startLives
         score: boot.current.startScore,
         lives: boot.current.startLives,
       });
+
+      // The stage can be CSS-rotated, so trust the container box, not the window.
+      const fit = () => {
+        const el = holder.current;
+        if (!el) return;
+        const w = Math.round(el.offsetWidth);
+        const h = Math.round(el.offsetHeight);
+        if (w > 0 && h > 0) game.scale.resize(w, h);
+      };
+      fit();
+      observer = new ResizeObserver(fit);
+      observer.observe(holder.current);
     })();
 
     return () => {
       cancelled = true;
+      observer?.disconnect();
       gameBus.off("state", handler);
       gameRef.current?.destroy(true);
       gameRef.current = null;
