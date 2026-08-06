@@ -54,7 +54,8 @@ export function Overlay({
   onRetryLevel,
   onGoHome,
 }: Props) {
-  if (status === "playing" || status === "levelselect" || status === "shop") return null;
+  if (status === "playing" || status === "levelselect" || status === "shop" || status === "settings")
+    return null;
 
 
   if (status === "start") {
