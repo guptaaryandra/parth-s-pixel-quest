@@ -257,30 +257,25 @@ export class GameScene extends Phaser.Scene {
     this.emitState();
   }
 
-  /**
-   * Camera-viewport scaling (Celeste / Dead Cells style).
-   *
-   * We never scale or stretch the canvas: the canvas is 1:1 with the device and
-   * the *camera* decides how much world is visible. The vertical field of view
-   * is fixed at VIEW_H world px (~2/3 of the old 720) so the hero and platforms
-   * read big, and wider screens simply reveal a little more world sideways —
-   * clamped so ultra-wide devices never see past the level design.
-   * Zoom is snapped to 1/4 steps to keep pixel art crisp.
-   */
+  /** Fits the world to any display ratio without ever scaling the canvas in CSS. */
   private applyZoom() {
     const { width, height } = this.scale.gameSize;
     if (!width || !height) return;
-    const VIEW_H = 480; // world px visible vertically (was 720 → 33% tighter)
-    const MAX_VIEW_W = 1100; // widest horizontal window we ever allow
-    const MIN_VIEW_W = 600;
-    let zoom = height / VIEW_H;
-    if (width / zoom > MAX_VIEW_W) zoom = width / MAX_VIEW_W;
-    if (width / zoom < MIN_VIEW_W) zoom = width / MIN_VIEW_W;
-    // Snap to 1/8 steps: fine enough to fit any screen, coarse enough that
-    // pixel edges stay stable (no shimmering) while scrolling.
-    zoom = Math.max(0.5, Math.round(zoom * 8) / 8);
+    const TARGET_VIEW_HEIGHT = 480;
+    const MAX_VIEW_WIDTH = 1100;
 
-    this.cameras.main.setZoom(zoom);
+    // Normal displays keep the same vertical field of view. Extra-wide screens
+    // reveal more level horizontally up to a safe cap; beyond that the camera
+    // increases its zoom just enough to keep the backdrop and map edge-to-edge.
+    const byHeight = height / TARGET_VIEW_HEIGHT;
+    const byWidth = width / MAX_VIEW_WIDTH;
+    const zoom = Math.max(0.5, byHeight, byWidth);
+
+    const camera = this.cameras.main;
+    camera.setViewport(0, 0, width, height);
+    camera.setZoom(zoom);
+    camera.setBounds(0, 0, this.worldWidth, WORLD_H);
+    camera.centerOn(this.player?.x ?? SPAWN.x, this.player?.y ?? SPAWN.y);
     this.layoutBackdrop();
   }
 
@@ -345,10 +340,12 @@ export class GameScene extends Phaser.Scene {
     const cam = this.cameras.main;
     const view = cam.worldView;
     if (!view.width || !this.sky) return;
-    const w = Math.ceil(view.width) + 2;
-    const h = Math.ceil(view.height) + 2;
-    const x = Math.floor(view.x);
-    const y = Math.floor(view.y);
+    // A small world-space bleed hides fractional-pixel seams at every zoom.
+    const bleed = 4;
+    const w = Math.ceil(view.width) + bleed * 2;
+    const h = Math.ceil(view.height) + bleed * 2;
+    const x = Math.floor(view.x) - bleed;
+    const y = Math.floor(view.y) - bleed;
 
     this.sky.setPosition(x, y).setDisplaySize(w, h);
     this.stars?.setPosition(x, y).setSize(w, Math.min(h, 420));

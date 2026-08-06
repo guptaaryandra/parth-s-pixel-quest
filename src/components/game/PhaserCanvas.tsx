@@ -54,15 +54,20 @@ export function PhaserCanvas({ paused, restartKey, level, startScore, startLives
         lives: boot.current.startLives,
       });
 
-      // The stage can be CSS-rotated, so trust the container box, not the window.
+      // The stage can be CSS-rotated, so trust its layout box rather than the
+      // browser orientation. Resize the renderer and camera together at the
+      // exact container ratio; CSS never scales the canvas afterward.
       const fit = () => {
         const el = holder.current;
         if (!el) return;
-        const w = Math.round(el.offsetWidth);
-        const h = Math.round(el.offsetHeight);
-        if (w > 0 && h > 0) game.scale.resize(w, h);
+        const w = Math.max(1, Math.round(el.clientWidth));
+        const h = Math.max(1, Math.round(el.clientHeight));
+        if (game.scale.width !== w || game.scale.height !== h) {
+          game.scale.resize(w, h);
+        }
       };
-      fit();
+      // Wait one frame for a rotated mobile stage to receive its final box.
+      requestAnimationFrame(fit);
       observer = new ResizeObserver(fit);
       observer.observe(holder.current);
     })();
@@ -83,5 +88,5 @@ export function PhaserCanvas({ paused, restartKey, level, startScore, startLives
     else scene.scene.resume();
   }, [paused]);
 
-  return <div ref={holder} className="h-full w-full" />;
+  return <div ref={holder} className="absolute inset-0 overflow-hidden [&>canvas]:block" />;
 }
