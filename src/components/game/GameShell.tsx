@@ -283,6 +283,18 @@ export function GameShell() {
           <div className="h-full w-full bg-gradient-night" />
         )}
 
+        {/* Safe-area layer: UI anchors to the usable screen edges (notches,
+            punch-holes, rounded corners, gesture bars) without scaling. */}
+        <div
+          className="pointer-events-none absolute inset-0 z-40"
+          style={{
+            paddingTop: "env(safe-area-inset-top)",
+            paddingRight: "env(safe-area-inset-right)",
+            paddingBottom: "env(safe-area-inset-bottom)",
+            paddingLeft: "env(safe-area-inset-left)",
+          }}
+        >
+          <div className="relative h-full w-full">
         {running && (
           <>
             <Hud
@@ -377,6 +389,8 @@ export function GameShell() {
               </button>
             </>
           )}
+        </div>
+          </div>
         </div>
 
         {status === "levelselect" && (
