@@ -536,7 +536,6 @@ export class Backdrop {
     const s = this.scene;
     const b = this.biome;
     const gy = this.groundY;
-    (window as unknown as Record<string, unknown>)['__bd'] = this;
 
     this.sky = s.add.image(0, 0, this.skyKey()).setOrigin(0, 0).setDepth(-4);
     this.stars = s.add.tileSprite(0, 0, TW, TW, this.starsKey()).setOrigin(0, 0).setDepth(-3).setAlpha(0.9);
@@ -561,12 +560,12 @@ export class Backdrop {
       .setAlpha(0.9);
 
     this.treesFar = s.add
-      .tileSprite(0, 0, TW, 260, this.treeBand("treesFar", 260, 0xff0000, 6, 0.9))
+      .tileSprite(0, 0, TW, 260, this.treeBand("treesFar", 260, shade(b.far, -0.12), 6, 0.9))
       .setOrigin(0, 1)
       .setDepth(1);
 
     this.treesMid = s.add
-      .tileSprite(0, 0, TW, 300, this.treeBand("treesMid", 300, 0xff00ff, 5, 1.05))
+      .tileSprite(0, 0, TW, 300, this.treeBand("treesMid", 300, shade(b.mid, 0.08), 5, 1.05))
       .setOrigin(0, 1)
       .setDepth(2);
 
