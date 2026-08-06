@@ -269,15 +269,20 @@ export class GameScene extends Phaser.Scene {
     // increases its zoom just enough to keep the backdrop and map edge-to-edge.
     const byHeight = height / TARGET_VIEW_HEIGHT;
     const byWidth = width / MAX_VIEW_WIDTH;
-    const zoom = Math.max(0.5, byHeight, byWidth);
+    let zoom = Math.max(0.5, byHeight, byWidth);
+    // Never ask the camera for more world than the level actually has.
+    const minZoomForWorld = Math.max(width / this.worldWidth, height / WORLD_H);
+    zoom = Math.max(zoom, minZoomForWorld);
 
     const camera = this.cameras.main;
     camera.setViewport(0, 0, width, height);
     camera.setZoom(zoom);
     camera.setBounds(0, 0, this.worldWidth, WORLD_H);
     camera.centerOn(this.player?.x ?? SPAWN.x, this.player?.y ?? SPAWN.y);
+    this.backdropSize = null;
     this.layoutBackdrop();
   }
+
 
   private buildBackground(palette: ReturnType<typeof getLevel>["palette"]) {
     const skyKey = `sky-${this.levelIndex}`;
