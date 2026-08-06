@@ -352,6 +352,9 @@ export function buildTextures(scene: Phaser.Scene, heroColors: Palette = {}) {
   drawPixelTexture(scene, "parth-idle", heroIdle, hero);
   drawPixelTexture(scene, "parth-run-a", heroRunA, hero);
   drawPixelTexture(scene, "parth-run-b", heroRunB, hero);
+  drawPixelTexture(scene, "parth-run-c", heroRunC, hero);
+  drawPixelTexture(scene, "parth-run-d", heroRunD, hero);
+
   drawPixelTexture(scene, "parth-jump", heroJump, hero);
 
   drawPixelTexture(scene, "monster-a", monsterA, MONSTER_PALETTE);
