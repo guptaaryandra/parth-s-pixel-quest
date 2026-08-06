@@ -625,23 +625,20 @@ export class GameScene extends Phaser.Scene {
     if (!onGround) {
       this.player.setTexture("parth-jump");
       this.player.anims.stop();
-      // Lean into the arc: nose up on the way up, down on the way down.
-      this.player.setAngle(Phaser.Math.Clamp(body.velocity.y * 0.02, -8, 8) * (this.player.flipX ? -1 : 1));
+      // Very small lean into the arc — no per-frame scaling.
+      this.player.setAngle(Phaser.Math.Clamp(body.velocity.y * 0.008, -3, 3) * (this.player.flipX ? -1 : 1));
     } else if (left || right) {
       if (this.player.anims.currentAnim?.key !== "parth-run") {
         this.player.anims.play("parth-run", true);
+        this.player.setAngle(0);
       }
-      // Subtle stride bob only — the leg frames carry the run now.
-      this.player.setAngle(Math.sin(this.time.now / 90) * 1.5);
-      this.player.setScale(1, 1 + Math.sin(this.time.now / 90) * 0.02);
-
-    } else {
+      // The leg frames carry the run; no tilt or bob writes each frame.
+    } else if (this.player.anims.currentAnim || this.player.texture.key !== "parth-idle") {
       this.player.anims.stop();
       this.player.setTexture("parth-idle");
       this.player.setAngle(0);
-      // Idle breathing.
-      this.player.setScale(1, 1 + Math.sin(this.time.now / 320) * 0.03);
     }
+
 
 
     if (this.player.x < 8) this.player.setX(8);
