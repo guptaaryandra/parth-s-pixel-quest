@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import { buildTextures } from "./pixels";
 import { controls, gameBus } from "./state";
 import { buildLayout, getLevel, TOTAL_LEVELS } from "./levels";
+import { Backdrop, biomeFor } from "./backdrop";
 import { sfx } from "./audio";
 import { addCoins, hasPower, loadShop, outfitColors, type ShopState } from "./shop";
 
@@ -32,14 +33,9 @@ export class GameScene extends Phaser.Scene {
   private finished = false;
   private wasOnGround = true;
 
-  // Backdrop layers — pinned to the camera viewport (see layoutBackdrop).
-  private sky: Phaser.GameObjects.Image | undefined;
-  private stars: Phaser.GameObjects.TileSprite | undefined;
-  private moon: Phaser.GameObjects.Arc | undefined;
-  private hillFar: Phaser.GameObjects.TileSprite | undefined;
-  private hillNear: Phaser.GameObjects.TileSprite | undefined;
-  /** Cached backdrop pixel size so we only resize layers when the view changes. */
-  private backdropSize: { w: number; h: number } | null = null;
+  /** Layered themed environment (sky, trees, props, foliage, ambience). */
+  private backdrop: Backdrop | undefined;
+
 
 
 
@@ -92,7 +88,7 @@ export class GameScene extends Phaser.Scene {
     this.physics.world.setBounds(0, 0, this.worldWidth, WORLD_H);
     this.cameras.main.setBounds(0, 0, this.worldWidth, WORLD_H);
 
-    this.buildBackground(cfg.palette);
+    this.buildBackground();
     this.buildAnimations();
 
     this.solids = this.physics.add.staticGroup();
@@ -282,109 +278,13 @@ export class GameScene extends Phaser.Scene {
     camera.setZoom(zoom);
     camera.setBounds(0, 0, this.worldWidth, WORLD_H);
     camera.centerOn(this.player?.x ?? SPAWN.x, this.player?.y ?? SPAWN.y);
-    this.backdropSize = null;
-    this.layoutBackdrop();
+    this.backdrop?.layout();
   }
 
-
-  private buildBackground(palette: ReturnType<typeof getLevel>["palette"]) {
-    const skyKey = `sky-${this.levelIndex}`;
-    if (!this.textures.exists(skyKey)) {
-      const g = this.make.graphics({ x: 0, y: 0 }, false);
-      g.fillGradientStyle(palette.skyTop, palette.skyTop, palette.skyBottom, palette.skyBottom, 1);
-      g.fillRect(0, 0, 16, WORLD_H);
-      g.generateTexture(skyKey, 16, WORLD_H);
-      g.destroy();
-    }
-    const starKey = `stars-${this.levelIndex}`;
-    if (!this.textures.exists(starKey)) {
-      const g = this.make.graphics({ x: 0, y: 0 }, false);
-      for (let i = 0; i < 90; i++) {
-        g.fillStyle(0xffffff, Phaser.Math.FloatBetween(0.25, 1));
-        g.fillRect(Phaser.Math.Between(0, 511), Phaser.Math.Between(0, 511), 2, 2);
-      }
-      g.generateTexture(starKey, 512, 512);
-      g.destroy();
-    }
-    const hillKey = (name: string, color: number, h: number, step: number) => {
-      const key = `${name}-${this.levelIndex}`;
-      if (this.textures.exists(key)) return key;
-      const g = this.make.graphics({ x: 0, y: 0 }, false);
-      g.fillStyle(color, 1);
-      for (let i = -1; i <= Math.ceil(512 / step) + 1; i++) {
-        g.fillTriangle(i * step, h, i * step + step * 0.5, 0, i * step + step, h);
-      }
-      g.fillRect(0, h - 2, 512, 2);
-      g.generateTexture(key, 512, h);
-      g.destroy();
-      return key;
-    };
-
-    // Sky + stars are pinned to the camera window and stretched to cover it,
-    // so there is never a visible backdrop edge or empty margin.
-    this.sky = this.add.image(0, 0, skyKey).setOrigin(0, 0).setDepth(0);
-    this.stars = this.add.tileSprite(0, 0, 512, 512, starKey).setOrigin(0, 0).setDepth(1);
-    this.moon = this.add.circle(0, 0, 54, palette.moon, 0.92).setDepth(1);
-    this.tweens.add({ targets: this.moon, alpha: 0.7, duration: 2600, yoyo: true, repeat: -1 });
-
-    // Parallax hill bands: seamless tiling textures whose scroll is driven from
-    // the camera, so they extend forever instead of running out of world.
-    this.hillFar = this.add
-      .tileSprite(0, 0, 512, 210, hillKey("hill-far", palette.hillFar, 210, 300))
-      .setOrigin(0, 1)
-      .setAlpha(0.7)
-      .setDepth(2);
-    this.hillNear = this.add
-      .tileSprite(0, 0, 512, 320, hillKey("hill-near", palette.hillNear, 320, 240))
-      .setOrigin(0, 1)
-      .setDepth(2);
-
-
-    this.layoutBackdrop();
+  private buildBackground() {
+    this.backdrop = new Backdrop(this, biomeFor(this.levelIndex), GROUND_Y, WORLD_H);
   }
 
-  /**
-   * Keeps every backdrop layer glued to (and covering) the camera viewport.
-   * Positions update every frame (cheap); sizes only when the view changes.
-   */
-  private layoutBackdrop() {
-    const cam = this.cameras.main;
-    const view = cam.worldView;
-    if (!view.width || !this.sky) return;
-    // A generous world-space bleed hides fractional-pixel seams at every zoom.
-    const bleed = 8;
-    const w = Math.ceil(view.width) + bleed * 2;
-    const h = Math.ceil(view.height) + bleed * 2;
-    const x = Math.floor(view.x) - bleed;
-    const y = Math.floor(view.y) - bleed;
-
-    if (!this.backdropSize || this.backdropSize.w !== w || this.backdropSize.h !== h) {
-      this.backdropSize = { w, h };
-      this.sky.setDisplaySize(w, h);
-      this.stars?.setSize(w, Math.min(h, 420));
-      this.hillFar?.setSize(w, 210);
-      this.hillNear?.setSize(w, 320);
-    }
-
-    this.sky.setPosition(x, y);
-    this.moon?.setPosition(x + w * 0.78, y + h * 0.22);
-    if (this.stars) {
-      this.stars.setPosition(x, y);
-      this.stars.tilePositionX = cam.scrollX * 0.1;
-    }
-    // Hills keep their world-space footing (based at the ground line) while
-    // following the camera horizontally with parallax tile offsets.
-    if (this.hillFar) {
-      this.hillFar.setPosition(x, GROUND_Y + 40);
-      this.hillFar.tilePositionX = cam.scrollX * 0.75 + x * 0.25;
-    }
-    if (this.hillNear) {
-      this.hillNear.setPosition(x, GROUND_Y + 60);
-      this.hillNear.tilePositionX = cam.scrollX * 0.5 + x * 0.5;
-    }
-
-
-  }
 
 
   private buildAnimations() {
@@ -578,7 +478,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   override update() {
-    this.layoutBackdrop();
+    this.backdrop?.layout();
     if (this.finished) return;
     this.updateLurkers();
 
