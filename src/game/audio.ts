@@ -96,25 +96,23 @@ function noise(duration: number, gain = 0.6, delay = 0) {
 
 /* ----------------------------- background music ----------------------------- */
 
-const N: Record<string, number> = {
-  A2: 110, C3: 130.81, D3: 146.83, E3: 164.81, F3: 174.61, G3: 196,
-  A3: 220, C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392,
-  A4: 440, C5: 523.25, D5: 587.33, E5: 659.25, G5: 783.99, A5: 880,
-};
+const A2 = 110, C3 = 130.81, F3 = 174.61, G3 = 196;
+const A3 = 220, B3 = 246.94, C4 = 261.63, D4 = 293.66, E4 = 329.63, G4 = 392;
+const A4 = 440, C5 = 523.25, D5 = 587.33, E5 = 659.25, G5 = 783.99;
 
 /** 8-bar loop: bass root + arpeggio, gentle anime-adventure feel. */
 const CHORDS: { root: number; notes: number[] }[] = [
-  { root: N.A2, notes: [N.A3, N.C4, N.E4, N.C4] },
-  { root: N.F3, notes: [N.F3, N.A3, N.C4, N.A3] },
-  { root: N.C3, notes: [N.C4, N.E4, N.G4, N.E4] },
-  { root: N.G3, notes: [N.G3, N.B3 ?? N.D4, N.D4, N.B3 ?? N.G4] },
+  { root: A2, notes: [A3, C4, E4, C4] },
+  { root: F3, notes: [F3, A3, C4, A3] },
+  { root: C3, notes: [C4, E4, G4, E4] },
+  { root: G3, notes: [G3, B3, D4, B3] },
 ];
 
-const MELODY = [
-  N.E5, N.C5, N.D5, 0, N.E5, N.G5, 0, N.E5,
-  N.A4, N.C5, N.D5, 0, N.C5, N.A4, 0, 0,
-  N.G4, N.C5, N.E5, 0, N.D5, N.C5, 0, N.G4,
-  N.A4, N.D5, N.C5, 0, N.G4, 0, N.E4, 0,
+const MELODY: number[] = [
+  E5, C5, D5, 0, E5, G5, 0, E5,
+  A4, C5, D5, 0, C5, A4, 0, 0,
+  G4, C5, E5, 0, D5, C5, 0, G4,
+  A4, D5, C5, 0, G4, 0, E4, 0,
 ];
 
 const STEP = 0.19; // seconds per 16th-ish step
@@ -139,13 +137,14 @@ function voice(freq: number, dur: number, at: number, wave: Wave, gain: number) 
 }
 
 function scheduleStep(i: number, at: number) {
-  const chord = CHORDS[Math.floor(i / 8) % CHORDS.length];
+  const chord = CHORDS[Math.floor(i / 8) % CHORDS.length] ?? CHORDS[0]!;
   if (i % 8 === 0 || i % 8 === 4) voice(chord.root, STEP * 2.6, at, "triangle", 0.5);
-  const arp = chord.notes[(i / 2 | 0) % chord.notes.length];
+  const arp = chord.notes[((i / 2) | 0) % chord.notes.length] ?? chord.root;
   if (i % 2 === 0) voice(arp, STEP * 1.4, at, "square", 0.14);
-  const mel = MELODY[i % MELODY.length];
+  const mel = MELODY[i % MELODY.length] ?? 0;
   if (mel) voice(mel, STEP * 1.7, at, "triangle", 0.22);
 }
+
 
 function pump() {
   const ac = ensure();
