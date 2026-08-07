@@ -14,7 +14,7 @@ import {
 import { PhaserCanvas } from "./PhaserCanvas";
 import { controls, type GameStatus, type StatePatch } from "@/game/state";
 import { getLevel, TOTAL_LEVELS } from "@/game/levels";
-import { sfx } from "@/game/audio";
+import { DEFAULT_MIX, sfx, type AudioMix } from "@/game/audio";
 import { completeLevel, loadProgress } from "@/game/progress";
 import {
   buyItem,
@@ -82,6 +82,7 @@ export function GameShell() {
   const [runCoins, setRunCoins] = useState(0);
   const [totalCrystals, setTotalCrystals] = useState(5);
   const [muted, setMuted] = useState(false);
+  const [mix, setMix] = useState<AudioMix>(DEFAULT_MIX);
   const [unlocked, setUnlocked] = useState(0);
   const [best, setBest] = useState<Record<number, number>>({});
   const [shop, setShop] = useState<ShopState>({ coins: 0, owned: ["default"], outfit: "default" });
@@ -93,6 +94,7 @@ export function GameShell() {
 
   useEffect(() => {
     setMuted(sfx.loadMuted());
+    setMix(sfx.loadMix());
     const p = loadProgress();
     setUnlocked(Math.min(p.unlocked, TOTAL_LEVELS - 1));
     setBest(p.best);
@@ -428,6 +430,8 @@ export function GameShell() {
             onChange={updateLayout}
             onReset={resetControls}
             onBack={closeSettings}
+            mix={mix}
+            onMixChange={(next) => setMix(sfx.setMix(next))}
           />
         )}
 
