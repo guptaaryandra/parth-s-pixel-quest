@@ -106,6 +106,17 @@ export function GameShell() {
     setLayout(loadLayout());
   }, []);
 
+  /** Browsers need a gesture before audio can start — kick music off then. */
+  useEffect(() => {
+    const start = () => sfx.unlock();
+    window.addEventListener("pointerdown", start, { once: true });
+    window.addEventListener("keydown", start, { once: true });
+    return () => {
+      window.removeEventListener("pointerdown", start);
+      window.removeEventListener("keydown", start);
+    };
+  }, []);
+
   /** Landscape is the only supported orientation — keep asking for it. */
   useEffect(() => {
     void lockLandscape();
