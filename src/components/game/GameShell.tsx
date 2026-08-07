@@ -419,7 +419,7 @@ export function GameShell() {
             layout={layout}
             onChange={updateLayout}
             onReset={resetControls}
-            onBack={goHome}
+            onBack={closeSettings}
           />
         )}
 
