@@ -204,8 +204,8 @@ export function GameShell() {
   const openSettings = () => {
     sfx.click();
     controls.left = controls.right = controls.jump = false;
-    const from = status === "playing" ? "paused" : status;
-    setSettingsReturn(from);
+    // Remember the exact status so Back resumes the running level instantly.
+    setSettingsReturn(status);
     setStatus("settings");
   };
 
