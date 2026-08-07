@@ -204,8 +204,8 @@ export function GameShell() {
   const openSettings = () => {
     sfx.click();
     controls.left = controls.right = controls.jump = false;
-    const from = status === "playing" ? "paused" : status;
-    setSettingsReturn(from);
+    // Remember the exact status so Back resumes the running level instantly.
+    setSettingsReturn(status);
     setStatus("settings");
   };
 
@@ -247,8 +247,16 @@ export function GameShell() {
   });
 
   const view = useViewport();
+  // Settings opened from gameplay is a pause overlay: the scene stays mounted.
+  const settingsOverGame =
+    status === "settings" && (settingsReturn === "playing" || settingsReturn === "paused");
   const running = status === "playing" || status === "paused";
-  const inGame = running || status === "levelclear" || status === "gameover" || status === "victory";
+  const inGame =
+    running ||
+    settingsOverGame ||
+    status === "levelclear" ||
+    status === "gameover" ||
+    status === "victory";
   const level = getLevel(levelIndex);
 
   /**
