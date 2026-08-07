@@ -158,9 +158,6 @@ function startMusic() {
   musicTimer = window.setInterval(pump, 200);
 }
 
-let backgroundedInit = false;
-void backgroundedInit;
-
 function stopMusic() {
   musicOn = false;
   if (musicTimer != null) window.clearInterval(musicTimer);
