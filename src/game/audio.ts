@@ -46,7 +46,7 @@ function ensure(): AudioContext | null {
     musicBus.connect(master);
     applyMix();
   }
-  if (ctx.state === "suspended") void ctx.resume();
+  if (ctx.state === "suspended" && !backgrounded) void ctx.resume();
   return ctx;
 }
 
@@ -61,7 +61,7 @@ type ToneOpts = {
 
 function tone({ from, to, duration, wave = "square", gain = 1, delay = 0 }: ToneOpts) {
   const ac = ensure();
-  if (!ac || !sfxBus || muted || mix.sfx <= 0) return;
+  if (!ac || !sfxBus || muted || backgrounded || mix.sfx <= 0) return;
   const t0 = ac.currentTime + delay;
   const osc = ac.createOscillator();
   const env = ac.createGain();
@@ -158,6 +158,9 @@ function startMusic() {
   musicTimer = window.setInterval(pump, 200);
 }
 
+let backgroundedInit = false;
+void backgroundedInit;
+
 function stopMusic() {
   musicOn = false;
   if (musicTimer != null) window.clearInterval(musicTimer);
@@ -165,7 +168,7 @@ function stopMusic() {
 }
 
 function syncMusic() {
-  if (!muted && mix.music > 0) startMusic();
+  if (!muted && mix.music > 0 && !backgrounded) startMusic();
   else stopMusic();
 }
 
