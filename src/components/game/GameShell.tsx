@@ -72,6 +72,7 @@ function useViewport() {
 
 export function GameShell() {
   const [status, setStatus] = useState<GameStatus>("start");
+  const [settingsReturn, setSettingsReturn] = useState<GameStatus>("start");
   const [restartKey, setRestartKey] = useState(0);
   const [levelIndex, setLevelIndex] = useState(0);
   const [score, setScore] = useState(0);
@@ -203,8 +204,14 @@ export function GameShell() {
   const openSettings = () => {
     sfx.click();
     controls.left = controls.right = controls.jump = false;
-    setStatus((s) => (s === "playing" ? "paused" : s));
+    const from = status === "playing" ? "paused" : status;
+    setSettingsReturn(from);
     setStatus("settings");
+  };
+
+  const closeSettings = () => {
+    sfx.click();
+    setStatus(settingsReturn);
   };
 
   /** Live preview + autosave of the control layout. */
@@ -412,7 +419,7 @@ export function GameShell() {
             layout={layout}
             onChange={updateLayout}
             onReset={resetControls}
-            onBack={goHome}
+            onBack={closeSettings}
           />
         )}
 
