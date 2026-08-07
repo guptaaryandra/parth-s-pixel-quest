@@ -178,11 +178,39 @@ function persistMix() {
   }
 }
 
+/** True while the app is backgrounded — blocks any audio from being scheduled. */
+let backgrounded = false;
+
 export const sfx = {
   unlock() {
+    if (backgrounded) return;
     ensure();
     syncMusic();
   },
+  /** App went to background / lost focus: stop the loop and silence the graph. */
+  suspend() {
+    backgrounded = true;
+    stopMusic();
+    if (master) master.gain.value = 0;
+    if (ctx && ctx.state === "running") void ctx.suspend();
+  },
+  /** App is visible again: restore the graph and resume the loop where it left off. */
+  resume() {
+    backgrounded = false;
+    if (master) master.gain.value = 1;
+    if (ctx && ctx.state === "suspended") void ctx.resume();
+    syncMusic();
+  },
+  /** App is closing: release every audio resource so nothing outlives the page. */
+  dispose() {
+    backgrounded = true;
+    stopMusic();
+    const ac = ctx;
+    ctx = null;
+    master = sfxBus = musicBus = null;
+    if (ac) void ac.close().catch(() => undefined);
+  },
+
   isMuted() {
     return muted;
   },
