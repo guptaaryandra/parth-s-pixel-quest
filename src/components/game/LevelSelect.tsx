@@ -10,25 +10,25 @@ type Props = {
 
 export function LevelSelect({ unlocked, best, onSelect, onBack }: Props) {
   return (
-    <div className="absolute inset-0 z-30 flex flex-col gap-2 bg-overlay/90 px-3 py-2.5 backdrop-blur-sm animate-fade-in sm:px-6 sm:py-3">
-      <div className="flex items-center gap-2 pr-40">
+    <div className="absolute inset-0 z-30 flex flex-col gap-3 bg-overlay/90 px-4 py-3 backdrop-blur-sm animate-fade-in sm:px-8 sm:py-4">
+      <div className="flex items-center gap-3 pr-40">
         <button
           type="button"
           onPointerUp={onBack}
-          className="inline-flex shrink-0 touch-manipulation select-none items-center gap-1.5 rounded-lg border border-border bg-panel px-2.5 py-1.5 font-pixel text-[9px] text-foreground transition hover:bg-accent active:scale-95"
+          className="inline-flex shrink-0 touch-manipulation select-none items-center gap-2 rounded-lg border border-border bg-panel px-3 py-2 font-pixel text-[11px] text-foreground transition hover:bg-accent active:scale-95"
         >
-          <ArrowLeft size={12} /> Back
+          <ArrowLeft size={14} /> Back
         </button>
-        <span className="shrink-0 font-pixel text-[9px] text-muted-foreground tabular-nums">
+        <span className="shrink-0 font-pixel text-[11px] text-muted-foreground tabular-nums">
           {Math.min(unlocked + 1, LEVELS.length)}/{LEVELS.length}
         </span>
-        <h2 className="mr-auto truncate font-pixel text-[10px] text-crystal sm:text-xs">
+        <h2 className="mr-auto truncate font-pixel text-xs text-crystal sm:text-sm">
           Select Level
         </h2>
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
-        <div className="grid auto-rows-min justify-center gap-1.5 [grid-template-columns:repeat(auto-fill,minmax(2.75rem,1fr))] sm:gap-2 sm:[grid-template-columns:repeat(auto-fill,minmax(3.25rem,1fr))]">
+        <div className="grid auto-rows-min justify-center gap-2 [grid-template-columns:repeat(auto-fill,minmax(4rem,1fr))] sm:gap-3 sm:[grid-template-columns:repeat(auto-fill,minmax(4.5rem,1fr))]">
           {LEVELS.map((lvl, i) => {
             const locked = i > unlocked;
             const cleared = i < unlocked;
@@ -40,7 +40,7 @@ export function LevelSelect({ unlocked, best, onSelect, onBack }: Props) {
                 onPointerUp={() => !locked && onSelect(i)}
                 title={`${lvl.name} — ${lvl.tagline}`}
                 className={
-                  "relative mx-auto flex aspect-square w-full max-w-[3.5rem] touch-manipulation select-none flex-col items-center justify-center gap-px rounded-lg border text-foreground transition active:scale-95 " +
+                  "relative mx-auto flex aspect-square w-full max-w-[4.75rem] touch-manipulation select-none flex-col items-center justify-center gap-0.5 rounded-xl border text-foreground transition active:scale-95 " +
                   (locked
                     ? "cursor-not-allowed border-border/50 bg-panel/40 text-muted-foreground/60"
                     : cleared
@@ -48,16 +48,16 @@ export function LevelSelect({ unlocked, best, onSelect, onBack }: Props) {
                       : "border-gold/70 bg-gradient-hero text-primary-foreground shadow-glow")
                 }
               >
-                <span className="font-pixel text-[9px] leading-none tabular-nums">{lvl.id}</span>
+                <span className="font-pixel text-[11px] leading-none tabular-nums">{lvl.id}</span>
                 {locked ? (
-                  <Lock size={9} />
+                  <Lock size={12} />
                 ) : cleared ? (
-                  <Check size={9} className="text-crystal" />
+                  <Check size={12} className="text-crystal" />
                 ) : (
-                  <Play size={9} />
+                  <Play size={12} />
                 )}
                 {best[i] ? (
-                  <span className="text-[7px] leading-none tabular-nums opacity-80">{best[i]}</span>
+                  <span className="text-[9px] leading-none tabular-nums opacity-80">{best[i]}</span>
                 ) : null}
               </button>
             );
@@ -65,7 +65,7 @@ export function LevelSelect({ unlocked, best, onSelect, onBack }: Props) {
         </div>
       </div>
 
-      <p className="shrink-0 text-center text-[10px] leading-tight text-muted-foreground">
+      <p className="shrink-0 text-center text-[11px] leading-tight text-muted-foreground">
         Cleared levels stay unlocked on this device — pick up where you left off.
       </p>
     </div>
