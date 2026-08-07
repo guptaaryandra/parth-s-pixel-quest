@@ -117,6 +117,34 @@ export function GameShell() {
     };
   }, []);
 
+  /**
+   * App lifecycle: leaving the game (app switch, minimise, tab hidden, focus
+   * loss) pauses gameplay and silences audio; coming back resumes the exact
+   * frame. Closing the app releases every audio resource.
+   */
+  useEffect(() => {
+    const leave = () => {
+      controls.left = controls.right = controls.jump = false;
+      setStatus((s) => (s === "playing" ? "paused" : s));
+      sfx.suspend();
+    };
+    const enter = () => sfx.resume();
+    const onVisibility = () => (document.hidden ? leave() : enter());
+    const teardown = () => sfx.dispose();
+
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("blur", leave);
+    window.addEventListener("focus", enter);
+    window.addEventListener("pagehide", teardown);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("blur", leave);
+      window.removeEventListener("focus", enter);
+      window.removeEventListener("pagehide", teardown);
+    };
+  }, []);
+
+
   /** Landscape is the only supported orientation — keep asking for it. */
   useEffect(() => {
     void lockLandscape();
