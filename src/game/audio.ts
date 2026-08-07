@@ -256,11 +256,12 @@ export const sfx = {
   },
   hurt() {
     tone({ from: 400, to: 90, duration: 0.4, wave: "sawtooth", gain: 0.5 });
-    noise(0.24, 0.35);
+    thump(180, 60, 0.22, 0.3);
   },
   land() {
-    noise(0.09, 0.18);
+    thump(150, 70, 0.09, 0.18);
   },
+
   levelClear() {
     [523, 659, 784, 1046].forEach((f, i) =>
       tone({ from: f, duration: 0.22, wave: "square", gain: 0.4, delay: i * 0.12 }),
