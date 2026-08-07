@@ -72,6 +72,7 @@ function useViewport() {
 
 export function GameShell() {
   const [status, setStatus] = useState<GameStatus>("start");
+  const [settingsReturn, setSettingsReturn] = useState<GameStatus>("start");
   const [restartKey, setRestartKey] = useState(0);
   const [levelIndex, setLevelIndex] = useState(0);
   const [score, setScore] = useState(0);
