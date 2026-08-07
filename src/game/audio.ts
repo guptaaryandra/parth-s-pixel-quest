@@ -76,23 +76,15 @@ function tone({ from, to, duration, wave = "square", gain = 1, delay = 0 }: Tone
   osc.stop(t0 + duration + 0.02);
 }
 
-function noise(duration: number, gain = 0.6, delay = 0) {
-  const ac = ensure();
-  if (!ac || !sfxBus || muted || mix.sfx <= 0) return;
-  const frames = Math.floor(ac.sampleRate * duration);
-  const buffer = ac.createBuffer(1, frames, ac.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let i = 0; i < frames; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / frames);
-  const src = ac.createBufferSource();
-  src.buffer = buffer;
-  const env = ac.createGain();
-  env.gain.value = gain;
-  const filter = ac.createBiquadFilter();
-  filter.type = "lowpass";
-  filter.frequency.value = 1400;
-  src.connect(filter).connect(env).connect(sfxBus);
-  src.start(ac.currentTime + delay);
+/**
+ * Percussive "thump" built from tuned oscillators only.
+ * Noise-based textures were removed: repeated white-noise bursts read as a
+ * continuous wind/ambient hiss during play, which we explicitly do not want.
+ */
+function thump(from: number, to: number, duration: number, gain = 0.4, delay = 0) {
+  tone({ from, to, duration, wave: "sine", gain, delay });
 }
+
 
 /* ----------------------------- background music ----------------------------- */
 
