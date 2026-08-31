@@ -1,3 +1,7 @@
+# Live Game Web Based.
+https://parths-anime-quest.lovable.app
+
+
 # Parth's Pixel Quest
 
 Create a responsive 2D browser game called "Parth's Anime Quest".
@@ -38,11 +42,7 @@ Features:
 
 - Organize code into reusable components
 
-This project was built with [Lovable](https://lovable.dev).
-
 ## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/25fe6162-c508-4e94-9cb5-7a36e6dcb37b).
 
 - **Ship faster**: describe what you want to build and Lovable handles the code.
 - **Stay in sync**: every change made in Lovable is committed straight to this repository.
