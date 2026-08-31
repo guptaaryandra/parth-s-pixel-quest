@@ -1,60 +1,77 @@
-# Live Game Web Based.
-https://parths-anime-quest.lovable.app
+<div align="center">
 
+# 🎮 Parth's Anime Quest
 
-# Parth's Pixel Quest
+### ⚔️ A Pixel-Art Adventure Through the Twilight Valley
 
-Create a responsive 2D browser game called "Parth's Anime Quest".
+[![Live Game](https://img.shields.io/badge/🎮_PLAY_LIVE-GAME-ff4f8b?style=for-the-badge)](https://parths-anime-quest.lovable.app)
+[![Repository](https://img.shields.io/badge/💻_SOURCE-GITHUB-181717?style=for-the-badge&logo=github)](https://github.com/guptaaryandra/parth-s-pixel-quest)
 
+<br>
 
+**Explore. Collect. Survive. Conquer all 50 worlds.**
 
-Use HTML5 Canvas with Phaser.js.
+<br>
 
+[ 🌐 **PLAY THE GAME** ](https://parths-anime-quest.lovable.app)
 
+</div>
 
-Features:
+---
 
-- Pixel art anime-inspired graphics
+## 🌙 Welcome to Twilight Valley
 
-- Main character named Parth
+**Parth's Anime Quest** is a retro-inspired pixel adventure built around exploration,
+collectibles, platforming, and enemy encounters.
 
-- Arrow keys or touch buttons for movement
+Step into the **Twilight Valley**, navigate through dangerous worlds, collect every
+glowing crystal, gather coins, avoid shadow monsters, and see how far you can make it
+with only **three lives**.
 
-- Jump mechanic
+> 🟣 **50 Worlds** &nbsp; • &nbsp; 💎 **Glowing Crystals** &nbsp; • &nbsp; 🪙 **Coins** &nbsp; • &nbsp; ❤️ **3 Lives**
 
-- Collect coins and blue crystals
+---
 
-- Avoid cute shadow monsters
+## 🎮 Play Now
 
-- Score and lives UI
+<div align="center">
 
-- Pause and restart buttons
+### ✨ Your adventure starts here
 
-- Start screen with Play button
+<a href="https://parths-anime-quest.lovable.app">
 
-- Game Over and Victory screens
+<img src="https://img.shields.io/badge/▶_LAUNCH_PARTH'S_ANIME_QUEST-PLAY_NOW-8b5cf6?style=for-the-badge&labelColor=111827" alt="Play Parth's Anime Quest">
 
-- Mobile-friendly controls
+</a>
 
-- Smooth animations
+<br><br>
 
-- Clean modern UI
+**🌐 Browser-based · No installation required · Play instantly**
 
-- Organize code into reusable components
+</div>
 
-## Build with Lovable
+---
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+## 🕹️ The Quest
 
-## Development
+Your objective is simple:
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
-```
+```text
+        🌌 ENTER TWILIGHT VALLEY
+                  │
+                  ▼
+          🗺️ Explore the World
+                  │
+          ┌───────┴───────┐
+          ▼               ▼
+       💎 Crystals      🪙 Coins
+          │               │
+          └───────┬───────┘
+                  ▼
+             👾 Enemies
+                  │
+                  ▼
+          ❤️ Protect Your Lives
+                  │
+                  ▼
+          🏆 Complete The Quest
