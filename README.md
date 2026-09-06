@@ -1,247 +1,244 @@
-# 🎮 Parth's Pixel Quest
+<div align="center">
 
-<p align="center">
-  <img src="./screenshots/Main%20menu.jpeg" alt="Parth's Pixel Quest - Main Menu" width="850">
-</p>
+# 🎮 Parth's Anime Quest
 
-<p align="center">
-  <strong>An anime-inspired pixel adventure game built for Android.</strong>
-</p>
+### ⚔️ A Pixel-Art Adventure Through the Twilight Valley
 
-<p align="center">
-  <a href="https://github.com/guptaaryandra/parth-s-pixel-quest/releases/latest">
-    <img src="https://img.shields.io/badge/⬇️%20Download-APK-brightgreen?style=for-the-badge" alt="Download APK">
-  </a>
-  <a href="https://github.com/guptaaryandra/parth-s-pixel-quest">
-    <img src="https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github" alt="GitHub Repository">
-  </a>
-</p>
+**Explore • Collect • Survive • Conquer**
+
+[![Latest Release](https://img.shields.io/github/v/release/guptaaryandra/parth-s-pixel-quest?style=for-the-badge&label=Latest%20Release)](https://github.com/guptaaryandra/parth-s-pixel-quest/releases/latest)
+[![GitHub Stars](https://img.shields.io/github/stars/guptaaryandra/parth-s-pixel-quest?style=for-the-badge)](https://github.com/guptaaryandra/parth-s-pixel-quest/stargazers)
+[![GitHub Issues](https://img.shields.io/github/issues/guptaaryandra/parth-s-pixel-quest?style=for-the-badge)](https://github.com/guptaaryandra/parth-s-pixel-quest/issues)
+[![License](https://img.shields.io/github/license/guptaaryandra/parth-s-pixel-quest?style=for-the-badge)](https://github.com/guptaaryandra/parth-s-pixel-quest/blob/main/LICENSE)
+
+<br>
+
+<img src="./screenshots/Main%20menu.jpeg" alt="Parth's Anime Quest Main Menu" width="850">
+
+<br><br>
+
+<a href="https://parths-anime-quest.lovable.app">
+  <img src="https://img.shields.io/badge/🌐%20PLAY%20ONLINE-4A90E2?style=for-the-badge" alt="Play Online">
+</a>
+
+&nbsp;
+
+<a href="https://github.com/guptaaryandra/parth-s-pixel-quest/releases/latest">
+  <img src="https://img.shields.io/badge/📱%20DOWNLOAD%20APK-28A745?style=for-the-badge" alt="Download APK">
+</a>
+
+&nbsp;
+
+<a href="https://github.com/guptaaryandra/parth-s-pixel-quest">
+  <img src="https://img.shields.io/badge/💻%20SOURCE%20CODE-181717?style=for-the-badge&logo=github" alt="Source Code">
+</a>
+
+</div>
 
 ---
 
-## 🌟 About The Game
+# 🌌 About The Game
 
-**Parth's Pixel Quest** is a pixel-art adventure game designed for Android, combining exploration, level progression, interactive controls, a shop system, and an anime-inspired visual style.
+**Parth's Anime Quest** is a pixel-art adventure game built around exploration, progression, combat, collectibles, and increasingly challenging levels.
 
-The game is built around progressing through levels, exploring the game world, managing gameplay settings, and completing challenges along the way.
+Journey through the **Twilight Valley**, explore different worlds, collect valuable resources, avoid dangerous enemies, and complete each level to progress through the adventure.
+
+The project started as a web-based game and is also packaged for Android.
 
 ---
 
-## ✨ Features
+# ✨ Features
 
 - 🎮 Pixel-art adventure gameplay
-- 🗺️ Multiple playable levels
+- 🗺️ Level-based progression
+- 💎 Collectible crystals
+- 🪙 Coins and rewards
+- 👾 Shadow monsters and hazards
+- ❤️ Three-life gameplay system
+- 🛒 In-game shop
+- ⚙️ Controls and settings
+- 🎵 Music & SFX controls
+- ⏸️ Pause system
 - 🏆 Level completion system
-- 🛍️ In-game shop
-- 🎛️ Custom gameplay controls
-- ⏸️ Pause menu
-- 🔊 Music & SFX controls
-- 📱 Android gameplay experience
-- 🎨 Anime-inspired pixel-art presentation
-- 🚀 Lightweight and focused gameplay experience
+- 📱 Android version
+- 🌐 Browser version
 
 ---
 
-## 📸 Screenshots
+# 🎮 Play & Download
 
-### 🏠 Main Menu
+## 🌐 Play Online
 
-<p align="center">
-  <img src="./screenshots/Main%20menu.jpeg" alt="Main Menu" width="850">
-</p>
+Play the browser version directly without installing anything.
 
-### 🎮 Gameplay
+👉 **[Play Parth's Anime Quest Online](https://parths-anime-quest.lovable.app)**
 
-<p align="center">
-  <img src="./screenshots/Gameplay.jpeg" alt="Gameplay" width="850">
-</p>
+---
 
-### 🗺️ Levels
+## 📱 Download Android APK
 
-<p align="center">
-  <img src="./screenshots/Levels.jpeg" alt="Levels Screen" width="850">
-</p>
+The latest Android APK is distributed through **GitHub Releases**.
 
-### 🏆 Level Cleared
+👉 **[Download the Latest APK](https://github.com/guptaaryandra/parth-s-pixel-quest/releases/latest)**
 
-<p align="center">
-  <img src="./screenshots/Level-Cleared.jpeg" alt="Level Cleared Screen" width="850">
-</p>
+### Current Release
 
-### 🛍️ Shop
+**v1.0.0 — First Public Android Release**
 
-<p align="center">
-  <img src="./screenshots/Shop.jpeg" alt="Shop Screen" width="850">
-</p>
+The current release includes:
 
-### 🎛️ Controls & Settings
+- 🎮 Core adventure gameplay
+- 🗺️ Level-based progression
+- 🏆 Level completion system
+- 🛒 In-game shop
+- ⚙️ Controls & settings
+- 🎵 Music & SFX controls
+- ⏸️ Pause screen
+- 📱 Android support
 
-<p align="center">
-  <img src="./screenshots/Controls%20Setting.jpeg" alt="Controls Settings" width="850">
-</p>
+### 📲 Installing the APK
 
-### 🔊 Music & SFX Settings
+1. Open the [latest GitHub Release](https://github.com/guptaaryandra/parth-s-pixel-quest/releases/latest).
+2. Download the `.apk` file.
+3. Transfer it to your Android device if necessary.
+4. Open the APK.
+5. Allow installation from unknown sources if Android asks.
+6. Install the game.
+7. Launch **Parth's Anime Quest** and start your adventure.
 
-<p align="center">
-  <img src="./screenshots/Music%26Sfx%20Setting.jpeg" alt="Music and SFX Settings" width="850">
-</p>
+> ⚠️ For security, download APK files only from the official GitHub Releases page.
 
-### ⏸️ Pause Screen
+---
 
-<p align="center">
-  <img src="./screenshots/Pause-Screen.jpeg" alt="Pause Screen" width="850">
-</p>
+# 🕹️ Gameplay
+
+The game focuses on exploration, survival, collection, and progression.
+
+### 💎 Collect
+
+Collect crystals and coins while exploring each level.
+
+### 👾 Survive
+
+Avoid enemies, hazards, and other dangers throughout the map.
+
+### ❤️ Manage Your Lives
+
+You have a limited number of lives. Use them wisely and try to complete each level without losing them all.
+
+### 🛒 Shop
+
+Use collected resources to interact with the in-game shop.
+
+### 🏆 Complete Levels
+
+Reach the objective and complete each level to continue your adventure.
+
+---
+
+# 📸 Screenshots
+
+## 🏠 Main Menu
+
+<div align="center">
+
+<img src="./screenshots/Main%20menu.jpeg" alt="Main Menu" width="800">
+
+</div>
 
 ---
 
 ## 🎮 Gameplay
 
-The game provides a simple and accessible adventure experience with:
+<div align="center">
 
-- Character movement and gameplay controls
-- Level-based progression
-- A dedicated level selection screen
-- Level completion feedback
-- An in-game shop
-- Pause and resume functionality
-- Separate music and sound-effects controls
+<img src="./screenshots/Gameplay.jpeg" alt="Gameplay" width="800">
+
+</div>
 
 ---
 
-## 📱 Android
+## 🗺️ Level Selection
 
-Parth's Pixel Quest is currently distributed as an **Android APK**.
+<div align="center">
 
-### Installation
+<img src="./screenshots/Levels.jpeg" alt="Level Selection" width="800">
 
-1. Open the **Releases** section of this repository.
-2. Download the latest `Parths-Pixel-Quest-*.apk` file.
-3. Transfer/open the APK on your Android device.
-4. If prompted, allow installation from the source you used to download the APK.
-5. Install and launch the game.
-
-> ⚠️ For the safest installation, download the APK only from the Releases section of this repository.
-
-### ⬇️ Download the Latest APK
-
-<p align="center">
-  <a href="https://github.com/guptaaryandra/parth-s-pixel-quest/releases/latest">
-    <img src="https://img.shields.io/badge/Download%20Latest%20Release-APK-success?style=for-the-badge&logo=android" alt="Download Latest APK">
-  </a>
-</p>
+</div>
 
 ---
 
-## 🛠️ Project Structure
+## 🏆 Level Completed
 
-The repository contains the game's Android project, source code, build configuration, and documentation assets.
+<div align="center">
 
-```text
-parth-s-pixel-quest/
-├── android/
-├── dist-android/
-├── public/
-├── screenshots/
-│   ├── Controls Setting.jpeg
-│   ├── Gameplay.jpeg
-│   ├── Level-Cleared.jpeg
-│   ├── Levels.jpeg
-│   ├── Main menu.jpeg
-│   ├── Music&Sfx Setting.jpeg
-│   ├── Pause-Screen.jpeg
-│   └── Shop.jpeg
-├── src/
-├── README.md
-└── ...
-```
+<img src="./screenshots/Level-Cleared.jpeg" alt="Level Cleared" width="800">
+
+</div>
 
 ---
 
-## 🚀 Releases
+## 🛒 In-Game Shop
 
-All playable Android builds are distributed through GitHub Releases.
+<div align="center">
 
-### Latest Release
+<img src="./screenshots/Shop.jpeg" alt="In-Game Shop" width="800">
 
-**[⬇️ Download the Latest APK](https://github.com/guptaaryandra/parth-s-pixel-quest/releases/latest)**
-
-Future releases can include:
-
-- New levels
-- Gameplay improvements
-- Bug fixes
-- New content
-- Performance improvements
-- New features
+</div>
 
 ---
 
-## 🗺️ Roadmap
+## ⚙️ Controls Settings
 
-### ✅ Current
+<div align="center">
 
-- [x] Android build
-- [x] Core gameplay
-- [x] Level progression
-- [x] Level completion screen
-- [x] Controls/settings
-- [x] Music & SFX settings
-- [x] Pause screen
-- [x] Shop
-- [x] Public APK distribution
+<img src="./screenshots/Controls%20Setting.jpeg" alt="Controls Settings" width="800">
 
-### 🔄 Future Improvements
-
-- [ ] More levels and environments
-- [ ] Additional gameplay mechanics
-- [ ] More shop content
-- [ ] Additional characters/content
-- [ ] Further performance optimization
-- [ ] Additional polish and effects
+</div>
 
 ---
 
-## 🐛 Bug Reports & Feedback
+## 🎵 Music & SFX Settings
 
-Found a bug or have an idea for the game?
+<div align="center">
 
-Please open a **GitHub Issue** and include:
+<img src="./screenshots/Music%26Sfx%20Setting.jpeg" alt="Music and SFX Settings" width="800">
 
-- Device model
-- Android version
-- Game version
-- Steps to reproduce the issue
-- Screenshot or screen recording, if available
-
-**[🐛 Report an Issue](https://github.com/guptaaryandra/parth-s-pixel-quest/issues)**
+</div>
 
 ---
 
-## 👨‍💻 Developer
+## ⏸️ Pause Screen
 
-**Aryandra Gupta**
+<div align="center">
 
-Cloud / DevOps Engineer in the Making  
-Android • Game Development • Cloud • DevOps • Linux
+<img src="./screenshots/Pause-Screen.jpeg" alt="Pause Screen" width="800">
 
-<p>
-  <a href="https://github.com/guptaaryandra">
-    <img src="https://img.shields.io/badge/GitHub-guptaaryandra-181717?style=for-the-badge&logo=github" alt="GitHub">
-  </a>
-</p>
+</div>
 
 ---
 
-## 📄 License
+# 💻 Local Development
 
-See the repository for the applicable license and project terms.
+Want to explore the source code, modify the game, or contribute?
+
+You can clone the repository and run the web version locally.
 
 ---
 
-<p align="center">
-  <strong>🎮 Built with passion, pixels, and plenty of debugging.</strong>
-</p>
+## 📋 Prerequisites
 
-<p align="center">
-  ⭐ If you like the project, consider giving the repository a star!
-</p>
+Make sure you have the following installed:
+
+- [Node.js](https://nodejs.org/)
+- [Git](https://git-scm.com/)
+- npm
+
+The repository also includes a `bun.lock` file, so **Bun** can be used as an alternative package manager.
+
+---
+
+## 📥 Clone the Repository
+
+```bash
+git clone https://github.com/guptaaryandra/parth-s-pixel-quest.git
